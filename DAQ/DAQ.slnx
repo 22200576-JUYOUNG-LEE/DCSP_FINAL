@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="DAQ.vcxproj" Id="8c2fdb38-c026-483d-883d-6b6ab34be9dc" />
+</Solution>
