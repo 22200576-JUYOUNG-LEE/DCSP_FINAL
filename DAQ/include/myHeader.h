@@ -27,7 +27,7 @@
 
 #define   DYNA_N_STEP_MAX (int)   (          10000)
 
-#define   PAUSE_TIME      (double) 1
+#define   PAUSE_TIME      (double) 1.0
 
 #define   MOTOR_OFF_Vsw   (double) 0.0
 #define   MOTOR_ON_Vsw    (double) 3.0
@@ -37,7 +37,7 @@
 #define   Vpoten_MAX      (double) 5
 #define   Vdz             (double) 0.05
 
-#define   Kg              (double) (1000 * UNIT_PI) / (0.67 * 180)
+#define   Kg              (double) (1000 * UNIT_PI) / (0.67 * 180) //GYRO_V2RADS
 
 
 typedef struct {
@@ -55,9 +55,9 @@ double GetWindowTime(void);
 void SaveDataset(const char* DirName, const char* OutFileName, const Dataset* Out_Dataset, const int num_col, const int num_row);
 
 // 2. myDAQ.c
-void InitDAQ(TaskHandle* taskAI, TaskHandle* taskAO, int devNum);
-void ResetDAQ(TaskHandle taskAO);
-void WriteDAQ(TaskHandle taskAO, double Vcmd);
+void InitDAQ(TaskHandle* taskAI, TaskHandle* taskAO, int devNum);// TaskHandle* taskAI -> Global // alt key
+void ResetDAQ(TaskHandle taskAO); // 글자수 동일하게 만들기, DAQ앞으로 빼서 정의하기
+void WriteDAQ(TaskHandle taskAO, double Vcmd);// Argument는 만들지 마라, 두 채널을 쓴다면, 두 채널을 
 void ReadDAQ(TaskHandle taskAI, double* Vin);
 void PauseDAQ(TaskHandle taskAO);
 void CloseDAQ(TaskHandle taskAI, TaskHandle taskAO);
@@ -73,6 +73,8 @@ void   ObtainMotorStaticProperty(TaskHandle taskAI, TaskHandle taskAO, double Vg
 // 5. myValidation.c
 void Validation(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset);
 double Vali_triangle(double Vcmd, double time, double Wgyro, double Vpoten);
+//Vali -> Valid 
+// 인배디드는 void로 선언 
 double Vali_sin(double Vcmd, double time, double Wgyro, double Vpoten);
 double Linear_func1(double Vcmd);
 double Linear_func2(double vin, double vdz);

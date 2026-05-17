@@ -1,6 +1,8 @@
 **/.vs/
+**/.asv/
 **/Debug/
 **/Release/
 **/x64/
 *.zip
 *.ipch
+

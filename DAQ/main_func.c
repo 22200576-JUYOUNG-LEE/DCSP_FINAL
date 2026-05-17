@@ -20,14 +20,16 @@ int main(void)
     int         User_mode = 0;
 
     InitDAQ(&taskAI, &taskAO, DEV_NUM);
-
+    // 1. 순서도 작성하라, Flow가 전부 보이게하라
+    // 2. 함수하고 스위치로
     Vgyro_offset = Find_Vgyro_offset(taskAI, taskAO);
 
     User_mode = SelectOperatingMode();
 
+    // 이 스위치 구문은 어디로 들어가한다. 
     switch (User_mode) {
-        case 1:
-            printf("[Obtain Motor Static Property] ...\n");
+        case 1: // 1 (번호로 되어있는 것을 유저 모드)
+            printf("[Obtain Motor Static Property] ...\n"); // 텍스트 array로 만들어서 저장하라
             ObtainMotorStaticProperty(taskAI, taskAO, Vgyro_offset);
             break;
         case 2:
@@ -134,7 +136,7 @@ void Modi_ObtainMotorStaticProperty(TaskHandle taskAI, TaskHandle taskAO, double
     SaveDataset(OutDirName, OutFileName, Out_static_Dataset, 2, NUM_SWEEP_RUNS);
 }
 
-
+// 
 
 void Dynamic_function(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset, double Final_time, const char* OutDirName, const char* OutFileName,double (*Processing)(double, double, double, double)) {
     float64     Vin[NUM_AI_CHANNELS] = { 0.0 };
