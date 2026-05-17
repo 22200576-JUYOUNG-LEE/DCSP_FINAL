@@ -3,7 +3,7 @@
 #define   NUM_SWEEP_RUNS        (int)   (22)
 
 
-void Slewrate(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset) {
+void Slewrate() {
 
     double      Vstep = 0.1; // [V]
     double      Vcmd = 0.0;
@@ -20,19 +20,19 @@ void Slewrate(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset) {
 
 
     for (int mag = 18; mag < NUM_SWEEP_RUNS; mag++) {
-        PauseDAQ(taskAO);
+        DAQ_Pause();
         printf("\n[%d/%d]", (mag + 1), NUM_SWEEP_RUNS);
 
         Vcmd = (mag + 1) * Vstep;
 
-        Wgyro_avg = modi_Find_Wgyro_avg(taskAI, taskAO, Vcmd, "Slewrate", Vgyro_offset);
+        Wgyro_avg = modi_Find_Wgyro_avg(Vcmd, "Slewrate");
 
         Summary_Vcmd_avg[mag] = Vcmd;
         Summary_Wgyro_avg[mag] = Wgyro_avg;
     }
 }
 
-double modi_Find_Wgyro_avg(TaskHandle taskAI, TaskHandle taskAO, double Vcmd, char* OutDirName, double Vgyro_offset) {
+double modi_Find_Wgyro_avg(double Vcmd, char* OutDirName) {
     float64     Vin[NUM_AI_CHANNELS] = { 0.0 };
 
     double      Wgyro_avg = 0.0;    //[rad/sec]
@@ -69,8 +69,8 @@ double modi_Find_Wgyro_avg(TaskHandle taskAI, TaskHandle taskAO, double Vcmd, ch
         if (count > N_STEP / 2) {
             Vc = Linear_func2(Vcmd, Vdz);
 
-            WriteDAQ(taskAO, Vc);
-            ReadDAQ(taskAI, Vin);
+            DAQ_Write(Vc);
+            DAQ_Read(Vin);
 
             Vgyro_curr = Vin[2];
             Wgyro = Kg * (Vgyro_curr - Vgyro_offset);
@@ -84,7 +84,7 @@ double modi_Find_Wgyro_avg(TaskHandle taskAI, TaskHandle taskAO, double Vcmd, ch
         // @. Emergency Stop
         if (_kbhit())
             if (_getch() == 's') {
-                CloseDAQ(taskAI, taskAO);
+                DAQ_Close();
                 exit(0);
             }
 

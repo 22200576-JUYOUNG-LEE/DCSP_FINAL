@@ -40,6 +40,13 @@
 #define   Kg              (double) (1000 * UNIT_PI) / (0.67 * 180) //GYRO_V2RADS
 
 
+extern TaskHandle  taskAI;
+extern TaskHandle  taskAO;
+
+extern double      Vgyro_offset;
+
+extern int         User_mode;
+
 typedef struct {
     const char* name;
     const double* data;
@@ -47,31 +54,30 @@ typedef struct {
 
 // main.c
 int SelectOperatingMode();
-void Dynamic_function(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset, double Final_time, 
-    const char* OutDirName, const char* OutFileName, double (*Processing)(double, double, double, double));
+void Dynamic_function(double Final_time, const char* OutDirName, const char* OutFileName, double (*Processing)(double, double, double, double));
 
 // 1. myWin.c
 double GetWindowTime(void);
 void SaveDataset(const char* DirName, const char* OutFileName, const Dataset* Out_Dataset, const int num_col, const int num_row);
 
 // 2. myDAQ.c
-void InitDAQ(TaskHandle* taskAI, TaskHandle* taskAO, int devNum);// TaskHandle* taskAI -> Global // alt key
-void ResetDAQ(TaskHandle taskAO); // 글자수 동일하게 만들기, DAQ앞으로 빼서 정의하기
-void WriteDAQ(TaskHandle taskAO, double Vcmd);// Argument는 만들지 마라, 두 채널을 쓴다면, 두 채널을 
-void ReadDAQ(TaskHandle taskAI, double* Vin);
-void PauseDAQ(TaskHandle taskAO);
-void CloseDAQ(TaskHandle taskAI, TaskHandle taskAO);
+void DAQ_Init(int devNum);// TaskHandle* taskAI -> Global // alt key
+void DAQ_Reset(); // 글자수 동일하게 만들기, DAQ앞으로 빼서 정의하기
+void DAQ_Write(double Vcmd);// Argument는 만들지 마라, 두 채널을 쓴다면, 두 채널을 
+void DAQ_Read(double* Vin);
+void DAQ_Pause();
+void DAQ_Close();
 
 // 3. myMath.c
 double Cal_avg(int num_data, double Ybar_pre, double Y);
 
 // 4. myMotor.c
-double Find_Vgyro_offset(TaskHandle taskAI, TaskHandle taskAO);
-double Find_Wgyro_avg(TaskHandle taskAI, TaskHandle taskAO, char* OutDirName, double Vc, double Vgyro_offset);
-void   ObtainMotorStaticProperty(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset);
+double Find_Vgyro_offset();
+double Find_Wgyro_avg(char* OutDirName, double Vc);
+void   ObtainMotorStaticProperty();
 
 // 5. myValidation.c
-void Validation(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset);
+void Validation();
 double Vali_triangle(double Vcmd, double time, double Wgyro, double Vpoten);
 //Vali -> Valid 
 // 인배디드는 void로 선언 
@@ -80,13 +86,12 @@ double Linear_func1(double Vcmd);
 double Linear_func2(double vin, double vdz);
 
 //6. mySlewratelimit.c
-void Slewrate(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset);
-double modi_Find_Wgyro_avg(TaskHandle taskAI, TaskHandle taskAO, double Vcmd, char* OutDirName, double Vgyro_offset);
+void Slewrate();
+double modi_Find_Wgyro_avg(double Vcmd, char* OutDirName);
 
 // 7. myBode.c
-void BodeMag(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset);
-void Bode_Dynamic_function(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset, double freq, double Final_time,
-    const char* OutDirName, const char* OutFileName, double (*Processing)(double, double, double, double, double));
+void BodeMag();
+void Bode_Dynamic_function(double freq, double Final_time, const char* OutDirName, const char* OutFileName, double (*Processing)(double, double, double, double, double));
 double Bode_sin(double freq, double Vcmd, double time, double Wgyro, double Vpoten);
 
 

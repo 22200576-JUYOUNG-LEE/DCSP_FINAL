@@ -8,21 +8,23 @@
 
 #define   NUM_SWEEP_RUNS   (int) 70
 
-void Modi_ObtainMotorStaticProperty(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset);
+void Modi_ObtainMotorStaticProperty();
+
+TaskHandle  taskAI = 0;
+TaskHandle  taskAO = 0;
+
+double      Vgyro_offset = 0.0;
+
+int         User_mode = 0;
 
 int main(void)
 {
-    TaskHandle  taskAI = 0;
-    TaskHandle  taskAO = 0;
+    
 
-    double      Vgyro_offset = 0.0;
-
-    int         User_mode = 0;
-
-    InitDAQ(&taskAI, &taskAO, DEV_NUM);
+    DAQ_Init(DEV_NUM);
     // 1. 순서도 작성하라, Flow가 전부 보이게하라
     // 2. 함수하고 스위치로
-    Vgyro_offset = Find_Vgyro_offset(taskAI, taskAO);
+    Vgyro_offset = Find_Vgyro_offset();
 
     User_mode = SelectOperatingMode();
 
@@ -30,29 +32,29 @@ int main(void)
     switch (User_mode) {
         case 1: // 1 (번호로 되어있는 것을 유저 모드)
             printf("[Obtain Motor Static Property] ...\n"); // 텍스트 array로 만들어서 저장하라
-            ObtainMotorStaticProperty(taskAI, taskAO, Vgyro_offset);
+            ObtainMotorStaticProperty();
             break;
         case 2:
             printf("[Motor Validation] ...\n");
-            Validation(taskAI, taskAO, Vgyro_offset);
+            Validation();
             break;
         case 3:
             printf("[Slewrate Limit] ...\n");
-            Slewrate(taskAI, taskAO, Vgyro_offset);
+            Slewrate();
             break;
         case 4:
             printf("[Bode Mag] ...\n");
-            BodeMag(taskAI, taskAO, Vgyro_offset);
+            BodeMag();
             break;
         case 5:
             printf("[Bode Mag] ...\n");
-            Modi_ObtainMotorStaticProperty(taskAI, taskAO, Vgyro_offset);
+            Modi_ObtainMotorStaticProperty();
             break;
         default:
             printf("[ERROR] Wrong answer %d", User_mode);
             break;
     }
-    CloseDAQ(taskAI, taskAO);
+    DAQ_Close();
 
     return 0;
 }
@@ -74,7 +76,7 @@ int SelectOperatingMode() {
     return User_answer;
 }
 
-void Modi_ObtainMotorStaticProperty(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset) {
+void Modi_ObtainMotorStaticProperty() {
     double      Vcmd = 0.0;
 
     double      Vc_pos = 0;
@@ -106,7 +108,7 @@ void Modi_ObtainMotorStaticProperty(TaskHandle taskAI, TaskHandle taskAO, double
     for (int mag = 0; mag < NUM_SWEEP_RUNS / 2; mag++) {
 
         for (int j = 0; j < 2; j++) {
-            PauseDAQ(taskAO);
+            DAQ_Pause();
             printf("\n[%d/%d]", (2 * mag + 1) + j, NUM_SWEEP_RUNS);
 
             if (j == 0) { // Positive Direction
@@ -126,19 +128,18 @@ void Modi_ObtainMotorStaticProperty(TaskHandle taskAI, TaskHandle taskAO, double
             }
             Vcmd = Linear_func2(Vc_current,Vdz);
 
-            Wgyro_avg = Find_Wgyro_avg(taskAI, taskAO, "Vc2Wgyro", Vcmd, Vgyro_offset);
+            Wgyro_avg = Find_Wgyro_avg("Vc2Wgyro", Vcmd);
 
             Summary_Vc_avg[current_index] = Vc_current;
             Summary_Wgyro_avg[current_index] = Wgyro_avg * RAD2DEG;
         }
     }
-    PauseDAQ(taskAO);
     SaveDataset(OutDirName, OutFileName, Out_static_Dataset, 2, NUM_SWEEP_RUNS);
 }
 
 // 
 
-void Dynamic_function(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset, double Final_time, const char* OutDirName, const char* OutFileName,double (*Processing)(double, double, double, double)) {
+void Dynamic_function(double Final_time, const char* OutDirName, const char* OutFileName, double (*Processing)(double, double, double, double)) {
     float64     Vin[NUM_AI_CHANNELS] = { 0.0 };
 
     int         idx_max = Final_time * SAMPLING_FREQ;
@@ -182,8 +183,8 @@ void Dynamic_function(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset,
         Vc = Linear_func2(Vcmd, Vdz);
 
         // 3. Write and Read
-        WriteDAQ(taskAO, Vc);
-        ReadDAQ(taskAI, Vin);
+        DAQ_Write(Vc);
+        DAQ_Read(Vin);
 
         Vgyro = Vin[2];
         Wgyro = Kg * (Vgyro - Vgyro_offset);
@@ -199,7 +200,7 @@ void Dynamic_function(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset,
         // @. Emergency Stop
         if (_kbhit())
             if (_getch() == 's') {
-                CloseDAQ(taskAI, taskAO);
+                DAQ_Close();
                 exit(0);
             }
         // @. Wite for endging a tick
@@ -211,6 +212,6 @@ void Dynamic_function(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset,
         }
     }
 
-    SaveDataset(OutDirName ,OutFileName, Out_DAQ_Dataset, numDataset, idx_max);
+    SaveDataset(OutDirName, OutFileName, Out_DAQ_Dataset, numDataset, idx_max);
 }
 
