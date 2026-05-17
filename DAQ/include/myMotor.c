@@ -11,7 +11,7 @@
 
 #define   NUM_SWEEP_RUNS   (int) 101
 
-double Find_Vgyro_offset(TaskHandle taskAI, TaskHandle taskAO)
+double Find_Vgyro_offset()
 {
     double      time_init;
     double      time_curr;
@@ -25,14 +25,14 @@ double Find_Vgyro_offset(TaskHandle taskAI, TaskHandle taskAO)
 
     printf("\n[Calibration] Measuring Vgyro_offset (motor off, gimbal stationary)...\n");
 
-    ResetDAQ(taskAO);
+    DAQ_Reset();
 
     time_init = GetWindowTime();
     time_curr = time_init;
 
     for (int count = 0; count < N_STEP; count++)
     {
-        ReadDAQ(taskAI, Vin);
+        DAQ_Read(Vin);
 
         if (count > N_STEP / 2)
         {
@@ -55,7 +55,7 @@ double Find_Vgyro_offset(TaskHandle taskAI, TaskHandle taskAO)
     return Vgyro_offset;
 }
 
-double Find_Wgyro_avg(TaskHandle taskAI, TaskHandle taskAO, const   char* OutDirName, double Vc, double Vgyro_offset) {
+double Find_Wgyro_avg(const   char* OutDirName, double Vc) {
     float64     Vin[NUM_AI_CHANNELS] = { 0.0 };
 
     double      Wgyro_avg = 0.0;    //[rad/sec]
@@ -75,7 +75,7 @@ double Find_Wgyro_avg(TaskHandle taskAI, TaskHandle taskAO, const   char* OutDir
     char  OutFileName[100] = { "" };
 
     Dataset     Out_DAQ_Dataset[] = {
-        {"Time[sec]", Out_Time},
+        { "Time[sec]", Out_Time },
         {"\\omega_{gyro}[deg/sec]", Out_Wgyro_Data}
     };
     int         numDataset = sizeof(Out_DAQ_Dataset) / sizeof(Out_DAQ_Dataset[0]);
@@ -88,8 +88,8 @@ double Find_Wgyro_avg(TaskHandle taskAI, TaskHandle taskAO, const   char* OutDir
     {
         time = (time_curr - time_init) * 0.001; // [sec]
 
-        WriteDAQ(taskAO, Vc);
-        ReadDAQ(taskAI, Vin);
+        DAQ_Write(Vc);
+        DAQ_Read(Vin);
 
         Vgyro_curr = Vin[2];
         Wgyro = Kg * (Vgyro_curr - Vgyro_offset);
@@ -107,7 +107,7 @@ double Find_Wgyro_avg(TaskHandle taskAI, TaskHandle taskAO, const   char* OutDir
         // @. Emergency Stop
         if (_kbhit())
             if (_getch() == 's') {
-                CloseDAQ(taskAI, taskAO);
+                DAQ_Close();
                 exit(0);
             }
 
@@ -126,7 +126,7 @@ double Find_Wgyro_avg(TaskHandle taskAI, TaskHandle taskAO, const   char* OutDir
     return      Wgyro_avg;
 }
 
-void ObtainMotorStaticProperty(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset) {
+void ObtainMotorStaticProperty() {
 
     double      Vc_pos = Vcmd_offset;
     double      Vc_neg = Vcmd_offset;
@@ -157,7 +157,7 @@ void ObtainMotorStaticProperty(TaskHandle taskAI, TaskHandle taskAO, double Vgyr
     for (int mag = 0; mag < NUM_SWEEP_RUNS / 2; mag++) {
 
         for (int j = 0; j < 2; j++) {
-            PauseDAQ(taskAO);
+            DAQ_Pause();
             printf("\n[%d/%d]", (2 * mag + 1) + j, NUM_SWEEP_RUNS);
 
             if (j == 0) { // Positive Direction
@@ -178,7 +178,7 @@ void ObtainMotorStaticProperty(TaskHandle taskAI, TaskHandle taskAO, double Vgyr
                 current_index = mid_index - mag - 1;
             }
 
-            Wgyro_avg = Find_Wgyro_avg(taskAI, taskAO, "Vc2Wgyro", Vc_current, Vgyro_offset);
+            Wgyro_avg = Find_Wgyro_avg("Vc2Wgyro", Vc_current);
 
             Summary_Vc_avg[current_index] = Vc_current;
             Summary_Wgyro_avg[current_index] = Wgyro_avg * RAD2DEG;

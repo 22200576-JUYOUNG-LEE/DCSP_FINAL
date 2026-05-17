@@ -2,7 +2,7 @@
 
 #define   iter_MAX   (int) 23
 
-void Validation(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset) {
+void Validation() {
 
     double      Final_time_triangle = 26;
     double      Final_time_sin = 22;
@@ -15,9 +15,9 @@ void Validation(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset) {
 
         sprintf(OutFileName, "Vali_tri_iter%d.out", iter + 1);
 
-        PauseDAQ(taskAO);
-        PauseDAQ(taskAO);
-        Dynamic_function(taskAI, taskAO, Vgyro_offset, Final_time_triangle, OutDirName, OutFileName, Vali_triangle);
+        DAQ_Pause();
+        DAQ_Pause();
+        Dynamic_function(Final_time_triangle, OutDirName, OutFileName, Vali_triangle);
     }
 
     printf("\nValidation - sin\n");
@@ -25,8 +25,8 @@ void Validation(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset) {
 
         sprintf(OutFileName, "Vali_sin_iter%d.out", iter + 1);
 
-        PauseDAQ(taskAO);
-        Dynamic_function(taskAI, taskAO, Vgyro_offset, Final_time_sin, OutDirName, OutFileName, Vali_sin);
+        DAQ_Pause();
+        Dynamic_function(Final_time_sin, OutDirName, OutFileName, Vali_sin);
     }
 }
 

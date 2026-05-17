@@ -6,7 +6,7 @@
 
 
 
-void BodeMag(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset) {
+void BodeMag() {
     double      Final_time_sin = 6;
 
     const char* OutDirName = "BodeMag";
@@ -21,15 +21,14 @@ void BodeMag(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset) {
 
         sprintf(OutFileName, "BodeMag_sin_freq%.2f.out", freq);
 
-        PauseDAQ(taskAO);
-        PauseDAQ(taskAO);
-        Bode_Dynamic_function(taskAI, taskAO, Vgyro_offset, freq, Final_time_sin, OutDirName, OutFileName, Bode_sin);
+        DAQ_Pause();
+        DAQ_Pause();
+        Bode_Dynamic_function(freq, Final_time_sin, OutDirName, OutFileName, Bode_sin);
     }
 
 }
 
-void Bode_Dynamic_function(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_offset, double freq, double Final_time,
-    const char* OutDirName, const char* OutFileName, double (*Processing)(double, double, double, double, double)) {
+void Bode_Dynamic_function(double freq, double Final_time, const char* OutDirName, const char* OutFileName, double (*Processing)(double, double, double, double, double)) {
     float64     Vin[NUM_AI_CHANNELS] = { 0.0 };
 
     int         idx_max = Final_time * SAMPLING_FREQ;
@@ -73,8 +72,8 @@ void Bode_Dynamic_function(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_of
         Vc = Linear_func2(Vcmd, Vdz);
 
         // 3. Write and Read
-        WriteDAQ(taskAO, Vc);
-        ReadDAQ(taskAI, Vin);
+        DAQ_Write(Vc);
+        DAQ_Read(Vin);
 
         Vgyro = Vin[2];
         Wgyro = Kg * (Vgyro - Vgyro_offset);
@@ -90,7 +89,7 @@ void Bode_Dynamic_function(TaskHandle taskAI, TaskHandle taskAO, double Vgyro_of
         // @. Emergency Stop
         if (_kbhit())
             if (_getch() == 's') {
-                CloseDAQ(taskAI, taskAO);
+                DAQ_Close();
                 exit(0);
             }
         // @. Wite for endging a tick

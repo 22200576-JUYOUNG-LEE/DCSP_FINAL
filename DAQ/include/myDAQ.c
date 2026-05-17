@@ -1,6 +1,6 @@
 #include "myHeader.h"
 
-void InitDAQ(TaskHandle* taskAI, TaskHandle* taskAO, int devNum) {
+void DAQ_Init(int devNum) {
 
     printf("Press any key to start the program.... \n");
     getchar();
@@ -14,17 +14,17 @@ void InitDAQ(TaskHandle* taskAI, TaskHandle* taskAO, int devNum) {
     printf("Using AI channel: %s\n", aiChannelString);
     printf("Using AO channel: %s\n", aoChannelString);
 
-    DAQmxCreateTask("", taskAI);
-    DAQmxCreateTask("", taskAO);
+    DAQmxCreateTask("", &taskAI);
+    DAQmxCreateTask("", &taskAO);
 
-    DAQmxCreateAIVoltageChan(*taskAI, aiChannelString, "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, "");
-    DAQmxCreateAOVoltageChan(*taskAO, aoChannelString, "", 0, 5.0, DAQmx_Val_Volts, "");
+    DAQmxCreateAIVoltageChan(taskAI, aiChannelString, "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, "");
+    DAQmxCreateAOVoltageChan(taskAO, aoChannelString, "", 0, 5.0, DAQmx_Val_Volts, "");
 
-    DAQmxStartTask(*taskAI);
-    DAQmxStartTask(*taskAO);
+    DAQmxStartTask(taskAI);
+    DAQmxStartTask(taskAO);
 }
 
-void ResetDAQ(TaskHandle taskAO) {
+void DAQ_Reset() {
     int32       sampsWritten;
     int32       error;
     double      Vout[2] = { MOTOR_OFF_Vsw, MOTOR_OFF_Vcmd };
@@ -38,7 +38,7 @@ void ResetDAQ(TaskHandle taskAO) {
     }
 }
 
-void WriteDAQ(TaskHandle taskAO, double Vcmd) {
+void DAQ_Write(double Vcmd) {
     int32       sampsWritten;
     int32       error;
     double      Vout[2] = { MOTOR_ON_Vsw, 0.0 };
@@ -53,7 +53,7 @@ void WriteDAQ(TaskHandle taskAO, double Vcmd) {
     }
 }
 
-void ReadDAQ(TaskHandle taskAI, double* Vin) {
+void DAQ_Read(double* Vin) {
     int32       sampsRead;
     int32       error;
 
@@ -66,13 +66,13 @@ void ReadDAQ(TaskHandle taskAI, double* Vin) {
     }
 }
 
-void PauseDAQ(TaskHandle taskAO) {
+void DAQ_Pause() {
     double  time_init;
     double  time_curr;
 
     double  delay_ms = PAUSE_TIME * 1000;
 
-    ResetDAQ(taskAO);
+    DAQ_Reset();
 
     time_init = GetWindowTime();
     while (1) {
@@ -82,8 +82,8 @@ void PauseDAQ(TaskHandle taskAO) {
     }
 }
 
-void CloseDAQ(TaskHandle taskAI, TaskHandle taskAO) {
-    ResetDAQ(taskAO);
+void DAQ_Close() {
+    DAQ_Reset();
 
     DAQmxStopTask(taskAI);
     DAQmxStopTask(taskAO);
