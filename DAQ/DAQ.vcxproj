@@ -127,18 +127,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\myBode.c" />
-    <ClCompile Include="include\myDAQ.c" />
-    <ClCompile Include="include\myMath.c" />
-    <ClCompile Include="include\myMotor.c" />
-    <ClCompile Include="include\mySlewrate.c" />
-    <ClCompile Include="include\myValidation.c" />
-    <ClCompile Include="include\myWin.c" />
-    <ClCompile Include="main_func.c" />
-    <ClCompile Include="TEST.c" />
+    <ClCompile Include="include\BODE.c" />
+    <ClCompile Include="include\DAQ.c" />
+    <ClCompile Include="include\LIN.c" />
+    <ClCompile Include="include\MODE.c" />
+    <ClCompile Include="include\VALID.c" />
+    <ClCompile Include="include\SAVE.c" />
+    <ClCompile Include="include\STATIC.c" />
+    <ClCompile Include="system.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\myHeader.h" />
+    <ClInclude Include="include\Header.h" />
     <ClInclude Include="include\NIDAQmx.h" />
   </ItemGroup>
   <ItemGroup>

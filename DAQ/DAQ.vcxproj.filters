@@ -15,36 +15,33 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\myDAQ.c">
+    <ClCompile Include="include\DAQ.c">
       <Filter>헤더 파일</Filter>
     </ClCompile>
-    <ClCompile Include="include\myMath.c">
+    <ClCompile Include="include\SAVE.c">
       <Filter>헤더 파일</Filter>
     </ClCompile>
-    <ClCompile Include="include\myMotor.c">
+    <ClCompile Include="include\VALID.c">
       <Filter>헤더 파일</Filter>
     </ClCompile>
-    <ClCompile Include="include\myWin.c">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="main_func.c">
+    <ClCompile Include="system.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="TEST.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="include\myValidation.c">
+    <ClCompile Include="include\STATIC.c">
       <Filter>헤더 파일</Filter>
     </ClCompile>
-    <ClCompile Include="include\mySlewrate.c">
+    <ClCompile Include="include\MODE.c">
       <Filter>헤더 파일</Filter>
     </ClCompile>
-    <ClCompile Include="include\myBode.c">
+    <ClCompile Include="include\BODE.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\LIN.c">
       <Filter>헤더 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\myHeader.h">
+    <ClInclude Include="include\Header.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="include\NIDAQmx.h">
