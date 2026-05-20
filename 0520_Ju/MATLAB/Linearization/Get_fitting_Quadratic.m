@@ -7,7 +7,7 @@ function [coeff_pos, coeff_neg] = Get_fitting_Quadratic(filename)
     Vc=data(:,1); %[V] 
     Wgyro=data(:,2); %[deg/sec]
 
-    pos_region = (Vc >= 2.73) & (Vc <= 4.01); 
+    pos_region = (Vc >= 2.70) & (Vc <= 4.00); 
 
     Vc_pos=Vc(pos_region);
     Wgyro_pos=Wgyro(pos_region); 
@@ -18,7 +18,7 @@ function [coeff_pos, coeff_neg] = Get_fitting_Quadratic(filename)
     coeff_pos = A_pos \ B_pos; 
 
 
-    neg_region = (Vc >= 0.99) & (Vc <= 2.31);
+    neg_region = (Vc >= 1.00) & (Vc <= 2.30);
     Vc_neg = Vc(neg_region);
     Wgyro_neg = Wgyro(neg_region);
 

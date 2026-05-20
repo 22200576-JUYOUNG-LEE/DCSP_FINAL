@@ -5,8 +5,12 @@ function Linear_mapping(filename)
 
 data=readmatrix(filename, 'NumHeaderLines', 1, "FileType","text");
 
-V_c=data(:,1); 
+
 w_gyro=data(:,2); 
+
+w_model=data(:,2);
+V_c=data(:,1); 
+
 
 
 % 2. 선형화 모델 파라미터 (rad/s 기준)
@@ -15,7 +19,7 @@ a1 = 296.2148;  b1 = -78.8436;  c1 = -1383.6486;  % Negative region
 
 
 % 3. 모델 출력 계산 및 단위 변환 (rad/s -> deg/s)
-w_model=zeros(size(w_gyro)); 
+w_mdoe
 
 for i = 1:length(V_c)
     if V_c(i) > 2.70 % 양의 유효 구간
