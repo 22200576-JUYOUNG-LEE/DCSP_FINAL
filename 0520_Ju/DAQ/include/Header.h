@@ -63,8 +63,8 @@
 #define   STATIC_SIGN_POSITIVE  (int)(               0)
 #define   STATIC_SIGN_NEGATIVE  (int)(               1)
 
-#define   LIN_VOLT_START        (double)(        2.72)
-#define   LIN_GYRO_START        (double)(     54.8139)
+#define   LIN_VOLT_START        (double)(        2.76)
+#define   LIN_GYRO_START        (double)(     85.0817)
 #define   LIN_V_DEADZONE        (double) (    0.05)
 #define   LIN_COEFFI_POSITIVE_A (double)(-274.4147)
 #define   LIN_COEFFI_POSITIVE_B (double)(2725.1332)
