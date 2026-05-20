@@ -73,6 +73,8 @@ void StaticProperty(int Static_mode){
             sprintf(OutFileName, "Static_Step_%.2f.out", Vcmd);
 
             RunDAQ(STATIC_TIME_FINAL, STATIC_DATA_DIR, OutFileName, Static_Step);
+            printf("\nVcmd: %.2f", Vcmd);
+            printf("\nWgyro avg: %.4f \n", g_daqAvg.Wgyro);
 
             Summary_Vc_avg[idx_curr] =    g_daqAvg.Vcmd;
             Summary_Wgyro_avg[idx_curr] = g_daqAvg.Wgyro;

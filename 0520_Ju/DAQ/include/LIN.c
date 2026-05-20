@@ -3,8 +3,6 @@
 double Linearization(double vin) {
     double vcmd = LIN_VOLT_START;
 
-    double Vop1 = LIN_GYRO_START;
-
     double a1 = LIN_COEFFI_POSITIVE_A;
     double b1 = LIN_COEFFI_POSITIVE_B;
     double c1 = LIN_COEFFI_POSITIVE_C;
@@ -13,7 +11,7 @@ double Linearization(double vin) {
     double b2 = LIN_COEFFI_NEGATIVE_B;
     double c2 = LIN_COEFFI_NEGATIVE_C;
 
-    double klin = (Vop1 / LIN_V_DEADZONE);
+    double klin = (LIN_GYRO_START / LIN_V_DEADZONE);
 
     double w_ref = klin * vin;
     double discriminant = 0.0;
