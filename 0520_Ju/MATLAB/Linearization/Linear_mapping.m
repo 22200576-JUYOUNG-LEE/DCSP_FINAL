@@ -27,7 +27,6 @@ for i = 1:length(V_c)
         w_model(i) = 0; % 데드존
     end
 end
-% w_model_deg = w_model * (180 / pi); % 단위 변환
 
 % 4. 데이터 플롯 및 비교
 figure;
@@ -37,5 +36,15 @@ plot(V_c, w_model, 'r-', 'LineWidth', 2);
 xlabel('Command Voltage V_c [V]');
 ylabel('\omega_{gyro} [deg/s]');
 title('Motor Static Property vs Linearized Model');
+legend('Experimental Data (deg/s)', 'Linearized Model (deg/s)');
+grid on;
+
+figure;
+plot( w_gyro,V_c, 'o', 'MarkerEdgeColor', '#0072BD', 'MarkerFaceColor', '#0072BD', 'MarkerSize', 4);
+hold on;
+plot( w_model,V_c, 'r-', 'LineWidth', 2);
+xlabel('Command Voltage V_c [V]');
+ylabel('\omega_{gyro} [deg/s]');
+title('역함수');
 legend('Experimental Data (deg/s)', 'Linearized Model (deg/s)');
 grid on;

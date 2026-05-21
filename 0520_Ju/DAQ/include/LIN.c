@@ -9,6 +9,7 @@ double Linearization(double vin) {
 
     double vcmd = OperPoint_Vc;
 
+    double SlopeDeadZone = (OperPoint_Vc/ LIN_V_DEADZONE);
     double linearSlope = (OperPoint_Wgyro / LIN_V_DEADZONE);
 
     double w_ref = linearSlope * vin;
@@ -26,7 +27,7 @@ double Linearization(double vin) {
 
         if (discriminant >= 0) vcmd = (-b2 + sqrt(discriminant)) / (2.0 * a2);
     }
-    else vcmd = DAQ_V_STANDARD;
+    else vcmd = SlopeDeadZone * vin;
 
     return vcmd;
 }

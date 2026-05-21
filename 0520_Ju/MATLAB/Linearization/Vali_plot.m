@@ -7,7 +7,7 @@ function Vali_plot(signal_type)
     
     for idx = 1 : 23
         % 1. 동적 파일 이름 및 레전드 이름 생성
-        filename = sprintf('%sVali_%s_iter%d.out', base_dir, signal_type, idx);
+        filename = sprintf('%sValid_%s_iter%d.out', base_dir, signal_type, idx);
     
         if isfile(filename)
             % 2. Get Dataset
@@ -27,8 +27,8 @@ function Vali_plot(signal_type)
     end
 
     % 3. Data Processing - normalize
-    Vcmd = normalize(Vcmd, 'range', [-1 1]);
-    Wgyro = normalize(Wgyro, 'range', [-1 1]);
+    Vcmd = normalize(Vcmd, 'range', [-538 538]);
+    % Wgyro = normalize(Wgyro, 'range', [-1 1]);
 
     % 3-1. MA
     window_size = 10;
@@ -40,8 +40,8 @@ function Vali_plot(signal_type)
     Wgyro_mean = mean(Wgyro, 2, 'omitnan');
     Wgyro_std  = std(Wgyro, 0, 2, 'omitnan');
 
-    % 3-3 y axis shift
-    Wgyro_mean = Wgyro_mean - 0.02;
+    % % 3-3 y axis shift
+    % Wgyro_mean = Wgyro_mean - 0.02;
 
     
     % 3. Plot Dataset (1열: Time, 6열: Wgyro)

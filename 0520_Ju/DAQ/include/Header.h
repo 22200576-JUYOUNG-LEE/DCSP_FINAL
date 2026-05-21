@@ -51,7 +51,11 @@
 #define   OFFSET_DIR            (const char*)(     "Offset")
 #define   OFFSET_FILE           (const char*)( "Offset.out")
 
-#define   STATIC_V_STEP         (double) (     0.05)//       <- 
+//#define   STATIC_V_STEP         (double) (     0.05)//       <- 
+#define   STATIC_CLOSE_NEGATIVE_POINT   (double)(2.20)
+#define   STATIC_CLOSE_POSITIVE_POINT   (double)(2.80)
+#define   STATIC_WIDE_STEP      (double)(0.1)
+#define   STATIC_CLOSE_STEP     (double)(0.02)
 #define   STATIC_N_SWEEP        (int) (  70)
 #define   STATIC_TIME_PAUSE     (double) (1.0)
 #define   STATIC_TIME_DELAY     (double)(0.5)
@@ -74,7 +78,7 @@
 //#define   LIN_COEFFI_NEGATIVE_C (double)(-1654.5828)
 
 #define   VALID_DIR             (const char*)("Validation")
-#define   VALID_ITER_MAX        (int) (2)
+#define   VALID_ITER_MAX        (int) (18)
 
 #define   VALID_TRI_TIME_PAUSE  (double) (2.0)
 #define   VALID_TRI_TIME_PERIOD (double)(              5.0)
@@ -86,7 +90,7 @@
 
 #define   VALID_SIN_TIME_PAUSE  (double)(1.0)
 #define   VALID_SIN_AMPLITUDE   (double)(0.7)
-#define   VALID_SIN_TIME_FINAL  (double)(             22.0)
+#define   VALID_SIN_TIME_FINAL  (double)(             16.0)
 #define   VALID_SIN_TIME_1      (double)(1.0)
 #define   VALID_SIN_FREQ        (double)(0.07)
 #define   VALID_SIN_TIME_2      (double)(VALID_SIN_TIME_1+ 1 / VALID_SIN_FREQ)

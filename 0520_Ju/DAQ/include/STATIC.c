@@ -1,5 +1,7 @@
 #include "Header.h"
 
+
+
 static double      Vcmd = 0.0;
 
 char OutDirName[N_NAME_BUFFER] = { 0 };
@@ -12,7 +14,7 @@ void StaticProperty(int Static_mode){
     double      Vc_pos = 0.0;
     double      Vc_neg = 0.0;
 
-    double      Vstep = STATIC_V_STEP;
+    double      Vstep = 0.0;
 
     int         idx_curr = 0;
     int         idx_mid = STATIC_N_SWEEP / 2;
@@ -47,8 +49,6 @@ void StaticProperty(int Static_mode){
         RUN_DAQ_mode = LINEAR;
     }
 
-    //printf("\nThe Static proterty mode is %d [0 is Non]\n", RUN_DAQ_mode);
-
     for (int mag = 0; mag < STATIC_N_SWEEP / 2; mag++) {
 
         for (int j = 0; j < 2; j++) {
@@ -58,11 +58,21 @@ void StaticProperty(int Static_mode){
             DAQ_Pause(STATIC_TIME_PAUSE);
 
             if (j == STATIC_SIGN_POSITIVE) {
+
+                Vstep = (fabs(Vc_pos) > STATIC_CLOSE_NEGATIVE_POINT &&
+                    fabs(Vc_pos) < STATIC_CLOSE_POSITIVE_POINT)
+                    ? STATIC_CLOSE_STEP : STATIC_WIDE_STEP;
+
                 Vc_pos = Vc_pos + Vstep;
                 Vcmd = Vc_pos;
                 idx_curr = idx_mid + mag;
             }
             else {
+
+                Vstep = (fabs(Vc_neg) > STATIC_CLOSE_NEGATIVE_POINT &&
+                    fabs(Vc_neg) < STATIC_CLOSE_POSITIVE_POINT)
+                    ? STATIC_CLOSE_STEP : STATIC_WIDE_STEP;
+
                 Vc_neg = Vc_neg - Vstep;
                 Vcmd = Vc_neg;
                 idx_curr = idx_mid - mag - 1;
