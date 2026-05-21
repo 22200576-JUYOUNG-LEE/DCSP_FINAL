@@ -38,6 +38,8 @@ void DAQ_Init() {
     Vgyro_offset = g_daqAvg.Vgyro;
     printf("\nVgyro_offset is %.4f\n", Vgyro_offset);
 
+    ReadLinearCoefficent();
+
 }
 
 double Offset_Zero(DynState s) {

@@ -1,19 +1,17 @@
 #include "Header.h"
 
+double OperPoint_Vc = 0.0, OperPoint_Wgyro = 0.0;
+double a1 = 0.0, a2 = 0.0;
+double b1 = 0.0, b2 = 0.0;
+double c1 = 0.0, c2 = 0.0;
+
 double Linearization(double vin) {
-    double vcmd = LIN_VOLT_START;
 
-    double a1 = LIN_COEFFI_POSITIVE_A;
-    double b1 = LIN_COEFFI_POSITIVE_B;
-    double c1 = LIN_COEFFI_POSITIVE_C;
+    double vcmd = OperPoint_Vc;
 
-    double a2 = LIN_COEFFI_NEGATIVE_A;
-    double b2 = LIN_COEFFI_NEGATIVE_B;
-    double c2 = LIN_COEFFI_NEGATIVE_C;
+    double linearSlope = (OperPoint_Wgyro / LIN_V_DEADZONE);
 
-    double klin = (LIN_GYRO_START / LIN_V_DEADZONE);
-
-    double w_ref = klin * vin;
+    double w_ref = linearSlope * vin;
     double discriminant = 0.0;
 
     if (vin > LIN_V_DEADZONE) {
@@ -31,4 +29,21 @@ double Linearization(double vin) {
     else vcmd = DAQ_V_STANDARD;
 
     return vcmd;
+}
+
+void ReadLinearCoefficent(void) {
+    FILE* fp = fopen("../data/LIN_COEF.csv", "r");
+
+    if (fp == NULL) {
+        printf("ERROR: [IN Linearization] COULD NOT OPEN FILE!\n");
+        system("pause");
+        exit(1);
+    }
+
+    fscanf(fp, "%lf,%lf", &OperPoint_Vc, &OperPoint_Wgyro);
+    fscanf(fp, "%lf,%lf", &a1, &a2);
+    fscanf(fp, "%lf,%lf", &b1, &b2);
+    fscanf(fp, "%lf,%lf", &c1, &c2);
+
+    fclose(fp);
 }

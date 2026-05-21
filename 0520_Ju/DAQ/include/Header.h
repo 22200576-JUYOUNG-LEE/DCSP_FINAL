@@ -51,11 +51,11 @@
 #define   OFFSET_DIR            (const char*)(     "Offset")
 #define   OFFSET_FILE           (const char*)( "Offset.out")
 
-#define   STATIC_V_STEP         (double) (     0.02)//       <- 
-#define   STATIC_N_SWEEP        (int) (  50)
+#define   STATIC_V_STEP         (double) (     0.05)//       <- 
+#define   STATIC_N_SWEEP        (int) (  70)
 #define   STATIC_TIME_PAUSE     (double) (1.0)
 #define   STATIC_TIME_DELAY     (double)(0.5)
-#define   STATIC_TIME_FINAL     (double) (              5.0)
+#define   STATIC_TIME_FINAL     (double) (        4.0)
 #define   STATIC_DIR            (const char*)(     "Static")   
 #define   STATIC_DIR_LIN        (const char*)("Static_Linear")   
 #define   STATIC_FILE           (const char*)( "Static.out")
@@ -63,15 +63,15 @@
 #define   STATIC_SIGN_POSITIVE  (int)(               0)
 #define   STATIC_SIGN_NEGATIVE  (int)(               1)
 
-#define   LIN_VOLT_START        (double)(        2.76)
-#define   LIN_GYRO_START        (double)(     85.0817)
-#define   LIN_V_DEADZONE        (double) (    0.05)
-#define   LIN_COEFFI_POSITIVE_A (double)(-274.4147)
-#define   LIN_COEFFI_POSITIVE_B (double)(2725.1332)
-#define   LIN_COEFFI_POSITIVE_C (double)(-5352.2284)
-#define   LIN_COEFFI_NEGATIVE_A (double)(296.2148)
-#define   LIN_COEFFI_NEGATIVE_B (double)(-78.8436)
-#define   LIN_COEFFI_NEGATIVE_C (double)(-1383.6486)
+//#define   LIN_VOLT_START        (double)(2.75)
+//#define   LIN_GYRO_START        (double)(36.912)
+#define   LIN_V_DEADZONE        (double) (0.05)
+//#define   LIN_COEFFI_POSITIVE_A (double)(-180.3315)
+//#define   LIN_COEFFI_POSITIVE_B (double)(2117.6102)
+//#define   LIN_COEFFI_POSITIVE_C (double)(-4421.7240)
+//#define   LIN_COEFFI_NEGATIVE_A (double)(186.7132)
+//#define   LIN_COEFFI_NEGATIVE_B (double)(302.7634)
+//#define   LIN_COEFFI_NEGATIVE_C (double)(-1654.5828)
 
 #define   VALID_DIR             (const char*)("Validation")
 #define   VALID_ITER_MAX        (int) (2)
@@ -100,7 +100,7 @@
 #define   BODE_SIN_TIME_FINAL   (double)(6.0)
 #define   BODE_SIN_TIME_1       (double)(1.0)
 #define   BODE_SIN_TIME_2       (double)(5.0)
-#define   BODE_SIN_AMPLITUDE    (double)(0.7)
+#define   BODE_SIN_AMPLITUDE    (double)(1.0)
 
 
 typedef enum {
@@ -175,6 +175,7 @@ void StaticValidation();
 double Valid_triangle(DynState s);
 double Valid_sin(DynState s);
 double Linearization(double vin);
+void ReadLinearCoefficent(void);
 
 // 6. myBode.c
 void BodeMag();

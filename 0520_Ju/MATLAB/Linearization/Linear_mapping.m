@@ -1,5 +1,4 @@
 % 1. 원본 실험 데이터 로드 (V_c, w_gyro)
-% (제공해주신 데이터를 V_c와 w_gyro 배열로 입력합니다)
 function Linear_mapping(filename)
 
 
@@ -8,19 +7,21 @@ data=readmatrix(filename, 'NumHeaderLines', 1, "FileType","text");
 V_c=data(:,1); 
 w_gyro=data(:,2); 
 
+[coeff_pos, coeff_neg, pos_start, neg_start] = Get_fitting_Quadratic(filename);
 
-% 2. 선형화 모델 파라미터 (rad/s 기준)
-a = -274.4147;  b = 2725.1332;  c = -5352.2284;   % Positive region
-a1 = 296.2148;  b1 = -78.8436;  c1 = -1383.6486;  % Negative region
+% . 선형화 모델 파라미터 할당
+a = coeff_pos(1);   b = coeff_pos(2);   c = coeff_pos(3);    % Positive region
+a1 = coeff_neg(1);  b1 = coeff_neg(2);  c1 = coeff_neg(3);   % Negative region
+
 
 
 % 3. 모델 출력 계산 및 단위 변환 (rad/s -> deg/s)
 w_model=zeros(size(w_gyro)); 
 
 for i = 1:length(V_c)
-    if V_c(i) > 2.70 % 양의 유효 구간
+    if V_c(i) > pos_start % 양의 유효 구간
         w_model(i) = a*(V_c(i))^2 + b*V_c(i) + c;
-    elseif V_c(i) < 2.30 % 음의 유효 구간
+    elseif V_c(i) < neg_start % 음의 유효 구간
         w_model(i) = a1*(V_c(i))^2 + b1*V_c(i) + c1;
     else
         w_model(i) = 0; % 데드존
