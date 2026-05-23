@@ -16,8 +16,8 @@ pos_indices = V_c > pos_start;
 real_pos_start = min(V_c(pos_indices)); 
 
 
-mod_real_pos_start=2.80;
-mod_real_neg_start=2.20;
+mod_real_pos_start=2.76;
+mod_real_neg_start=2.26;
 
 
 neg_indices = V_c < neg_start;
@@ -29,8 +29,8 @@ w_neg_start = a1 * (mod_real_neg_start)^2 + b1 * mod_real_neg_start + c1;
 
 
 % Three point mapping
-V_dz = [2.2; 2.5; 2.8];
-W_dz = [-84.8113;    0;   103.68];
+V_dz = [mod_real_neg_start; 2.5; mod_real_pos_start];
+W_dz = [-55.6;    0;   56.8];
 
 A_dz = [V_dz.^2, V_dz, ones(3,1)];
 coeff_dz = A_dz \ W_dz;  % [a_dz, b_dz, c_dz]

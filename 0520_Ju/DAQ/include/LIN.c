@@ -35,6 +35,7 @@ double Linearization(double vin) {
         discriminant = b_deadZone * b_deadZone - 4.0 * a_deadZone * (c_deadZone - w_ref);
 
         if (discriminant >= 0) vcmd = (-b_deadZone + sqrt(discriminant)) / (2.0 * a_deadZone);
+        //return DAQ_V_STANDARD;
     }
 
     return vcmd;
