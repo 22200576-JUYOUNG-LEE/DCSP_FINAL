@@ -1,38 +1,55 @@
-% 1. 원본 실험 데이터 로드 (V_c, w_gyro)
-% (제공해주신 데이터를 V_c와 w_gyro 배열로 입력합니다)
 function Linear_mapping(filename)
+% 1. 원본 실험 데이터 로드 (V_c, w_gyro)
+data = readmatrix(filename, 'NumHeaderLines', 1, "FileType", "text");
+V_c = data(:, 1); 
+w_gyro = data(:, 2); 
 
 
-data=readmatrix(filename, 'NumHeaderLines', 1, "FileType","text");
+[coeff_pos, coeff_neg, pos_start, neg_start] = Get_fitting_Quadratic(filename);
 
 
-w_gyro=data(:,2); 
+a = coeff_pos(1);   b = coeff_pos(2);   c = coeff_pos(3);    % Positive region
+a1 = coeff_neg(1);  b1 = coeff_neg(2);  c1 = coeff_neg(3);   % Negative region
 
-w_model=data(:,2);
-V_c=data(:,1); 
-
-
-
-% 2. 선형화 모델 파라미터 (rad/s 기준)
-a = -274.4147;  b = 2725.1332;  c = -5352.2284;   % Positive region
-a1 = 296.2148;  b1 = -78.8436;  c1 = -1383.6486;  % Negative region
+pos_indices = find(V_c > pos_start);
+real_pos_start = min(V_c(pos_indices)); 
 
 
-% 3. 모델 출력 계산 및 단위 변환 (rad/s -> deg/s)
-w_mdoe
+neg_indices = find(V_c < neg_start);
+real_neg_start = max(V_c(neg_indices)); 
 
+
+w_pos_start = a * (real_pos_start)^2 + b * real_pos_start + c;
+w_neg_start = a1 * (real_neg_start)^2 + b1 * real_neg_start + c1;
+
+
+% 세 점으로 quadratic 계수 결정
+V_dz = [real_neg_start; 2.5; real_pos_start];
+W_dz = [w_neg_start;    0;   w_pos_start];
+
+A_dz = [V_dz.^2, V_dz, ones(3,1)];
+coeff_dz = A_dz \ W_dz;  % [a_dz, b_dz, c_dz]
+
+a_dz = coeff_dz(1);
+b_dz = coeff_dz(2);
+c_dz = coeff_dz(3);
+% ====================================================================
+
+w_model = zeros(size(V_c)); 
 for i = 1:length(V_c)
-    if V_c(i) > 2.70 % 양의 유효 구간
+    if V_c(i) >= real_pos_start 
+        
         w_model(i) = a*(V_c(i))^2 + b*V_c(i) + c;
-    elseif V_c(i) < 2.30 % 음의 유효 구간
+    elseif V_c(i) <= real_neg_start 
+       
         w_model(i) = a1*(V_c(i))^2 + b1*V_c(i) + c1;
     else
-        w_model(i) = 0; % 데드존
+        % linear interpolation
+        w_model(i) = a1*(V_c(i))^2 + b1*V_c(i) + c1;
     end
 end
-% w_model_deg = w_model * (180 / pi); % 단위 변환
 
-% 4. 데이터 플롯 및 비교
+%%plotting
 figure;
 plot(V_c, w_gyro, 'o', 'MarkerEdgeColor', '#0072BD', 'MarkerFaceColor', '#0072BD', 'MarkerSize', 4);
 hold on;
@@ -42,3 +59,14 @@ ylabel('\omega_{gyro} [deg/s]');
 title('Motor Static Property vs Linearized Model');
 legend('Experimental Data (deg/s)', 'Linearized Model (deg/s)');
 grid on;
+
+figure;
+plot(w_gyro, V_c, 'o', 'MarkerEdgeColor', '#0072BD', 'MarkerFaceColor', '#0072BD', 'MarkerSize', 4);
+hold on;
+plot(w_model, V_c, 'r-', 'LineWidth', 2);
+xlabel('\omega_{gyro} [deg/s]');
+ylabel('Command Voltage V_c [V]');
+title('Inverse Property (역함수)');
+legend('Experimental Data (deg/s)', 'Linearized Model (deg/s)');
+grid on;
+end

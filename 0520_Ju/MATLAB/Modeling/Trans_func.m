@@ -1,15 +1,17 @@
-clc, clear, close
-
+function [sys_final, g_initial]=Trans_func(path)
 %% 1. Get Data
-path = '..\..\data\BodeMag\';
+
 [f_exp, g_exp, p_exp] = generate_bode_plot(path);
+
 
 
 g_norm = g_exp / g_exp(1);
 
+g_initial=g_exp(1); 
+
 %% 2. Define Fit Range (1/10 to 1/3 of 4Hz Bandwidth)
 f_min = 0.4; 
-f_max = 1.33;
+f_max = 4.0;
 idx = find(f_exp >= f_min & f_exp <= f_max);
 
 
@@ -18,7 +20,7 @@ w = 2 * pi * f_exp(idx);
 
 %% 3. System Identification (invfreqs)
 
-[num, den] = invfreqs(h, w, 0, 2);
+[num, den] = invfreqs(h, w, 0, 1);
 sys_final = tf(num, den);
 
 figure;
@@ -42,3 +44,4 @@ semilogx(f_exp, p_exp, 'k.', 'MarkerSize', 12); hold on;
 [~, p_fit] = bode(sys_final, 2*pi*f_exp);
 semilogx(f_exp, squeeze(p_fit), 'b-', 'LineWidth', 2);
 grid on; ylabel('Phase (deg)'); xlabel('Frequency (Hz)');
+
