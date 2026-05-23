@@ -5,6 +5,10 @@ double a1 = 0.0, a2 = 0.0;
 double b1 = 0.0, b2 = 0.0;
 double c1 = 0.0, c2 = 0.0;
 
+double a_deadZone = 0.0;
+double b_deadZone = 0.0;
+double c_deadZone = 0.0;
+
 double Linearization(double vin) {
 
     double vcmd = OperPoint_Vc;
@@ -27,7 +31,11 @@ double Linearization(double vin) {
 
         if (discriminant >= 0) vcmd = (-b2 + sqrt(discriminant)) / (2.0 * a2);
     }
-    else vcmd = SlopeDeadZone * vin;
+    else {
+        discriminant = b_deadZone * b_deadZone - 4.0 * a_deadZone * (c_deadZone - w_ref);
+
+        if (discriminant >= 0) vcmd = (-b_deadZone + sqrt(discriminant)) / (2.0 * a_deadZone);
+    }
 
     return vcmd;
 }
@@ -45,6 +53,18 @@ void ReadLinearCoefficent(void) {
     fscanf(fp, "%lf,%lf", &a1, &a2);
     fscanf(fp, "%lf,%lf", &b1, &b2);
     fscanf(fp, "%lf,%lf", &c1, &c2);
+
+    fclose(fp);
+
+    fp = fopen("../data/LIN_DZ_COEF.csv", "r");
+
+    if (fp == NULL) {
+        printf("ERROR: [IN Linearization] COULD NOT OPEN FILE!\n");
+        system("pause");
+        exit(1);
+    }
+
+    fscanf(fp, "%lf,%lf,%lf", &a_deadZone, &b_deadZone, &c_deadZone);
 
     fclose(fp);
 }

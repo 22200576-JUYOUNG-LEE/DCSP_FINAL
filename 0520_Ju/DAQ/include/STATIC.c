@@ -22,7 +22,7 @@ void StaticProperty(int Static_mode){
     double      Summary_Wgyro_avg[STATIC_N_SWEEP] = { 0.0, };
 
     Dataset     Out_static_Dataset[] = {
-            {"V_c[V]", Summary_Vc_avg},
+            {"V_cmd[V]", Summary_Vc_avg},
             {"\\omega_{gyro_avg}[deg/s]",  Summary_Wgyro_avg},
     };
 
@@ -31,8 +31,8 @@ void StaticProperty(int Static_mode){
     if (Static_mode == NON_LINEAR) {
         printf("[Static Property Non-Linear] ...\n");// modify!
 
-        Vc_pos = DAQ_V_STANDARD;
-        Vc_neg = DAQ_V_STANDARD;
+        Vc_pos = STATIC_POSITIVE_START_POINT;
+        Vc_neg = STATIC_NEGATIVE_START_POINT;
 
         strcpy(OutDirName, STATIC_DIR);
 

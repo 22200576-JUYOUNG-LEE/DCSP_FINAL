@@ -10,7 +10,7 @@ function [coeff_pos, coeff_neg, pos_start, neg_start] = Get_fitting_Quadratic(fi
     pos_start = 2.70; pos_end = 4.00;
     neg_start = 2.30; neg_end = 1.00;
 
-    OperPoint_Vc = 2.80;
+    OperPoint_Vc = 2.74;
     [~, OperPoint_idx] = min(abs(Vc - OperPoint_Vc));
     OperPoint_Wgyro = Wgyro(OperPoint_idx);
 

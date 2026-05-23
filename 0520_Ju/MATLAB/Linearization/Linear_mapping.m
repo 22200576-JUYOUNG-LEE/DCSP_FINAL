@@ -16,17 +16,21 @@ pos_indices = V_c > pos_start;
 real_pos_start = min(V_c(pos_indices)); 
 
 
+mod_real_pos_start=2.80;
+mod_real_neg_start=2.20;
+
+
 neg_indices = V_c < neg_start;
 real_neg_start = max(V_c(neg_indices)); 
 
 
-w_pos_start = a * (real_pos_start)^2 + b * real_pos_start + c;
-w_neg_start = a1 * (real_neg_start)^2 + b1 * real_neg_start + c1;
+w_pos_start = a * (mod_real_pos_start)^2 + b * mod_real_pos_start + c;
+w_neg_start = a1 * (mod_real_neg_start)^2 + b1 * mod_real_neg_start + c1;
 
 
 % Three point mapping
-V_dz = [real_neg_start; 2.5; real_pos_start];
-W_dz = [w_neg_start;    0;   w_pos_start];
+V_dz = [2.2; 2.5; 2.8];
+W_dz = [-84.8113;    0;   103.68];
 
 A_dz = [V_dz.^2, V_dz, ones(3,1)];
 coeff_dz = A_dz \ W_dz;  % [a_dz, b_dz, c_dz]
@@ -36,12 +40,17 @@ b_dz = coeff_dz(2);
 c_dz = coeff_dz(3);
 % ====================================================================
 
+data_matrix = [a_dz, b_dz, c_dz];
+
+writematrix(data_matrix, '..\data\LIN_DZ_COEF.csv');
+
+
 w_model = zeros(size(V_c)); 
 for i = 1:length(V_c)
-    if V_c(i) >= real_pos_start 
+    if V_c(i) >= mod_real_pos_start 
         
         w_model(i) = a*(V_c(i))^2 + b*V_c(i) + c;
-    elseif V_c(i) <= real_neg_start 
+    elseif V_c(i) <= mod_real_neg_start 
        
         w_model(i) = a1*(V_c(i))^2 + b1*V_c(i) + c1;
     else

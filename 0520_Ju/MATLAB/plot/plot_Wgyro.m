@@ -1,11 +1,11 @@
 %% DC_PROJECT
 % 2. PLOT Wqyro
-function plot_Wgyro(base_dir)
+function plot_Wgyro(base_dir, start, final, step)
     
     %3. Plot Dataset
     figure(); hold on;
     
-    for idx = 1.0 : 0.1 : 1.8
+    for idx = start : step : final
     
         % 1. 동적 파일 이름 및 레전드 이름 생성
         filename = sprintf('../data/%s/Vcmd_%.2f_data.out', base_dir, idx);

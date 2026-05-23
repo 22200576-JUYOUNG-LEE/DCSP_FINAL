@@ -1,5 +1,4 @@
 function Trans_func_valid(path)
-
 %% Motor Validation: 
 
 [sys_final, g_initial]=Trans_func(path);

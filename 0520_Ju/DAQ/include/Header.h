@@ -52,11 +52,13 @@
 #define   OFFSET_FILE           (const char*)( "Offset.out")
 
 //#define   STATIC_V_STEP         (double) (     0.05)//       <- 
-#define   STATIC_CLOSE_NEGATIVE_POINT   (double)(2.20)
-#define   STATIC_CLOSE_POSITIVE_POINT   (double)(2.80)
-#define   STATIC_WIDE_STEP      (double)(0.1)
-#define   STATIC_CLOSE_STEP     (double)(0.02)
-#define   STATIC_N_SWEEP        (int) (  70)
+#define   STATIC_NEGATIVE_START_POINT   (double)(2.35)
+#define   STATIC_POSITIVE_START_POINT   (double)(2.65)
+#define   STATIC_CLOSE_NEGATIVE_POINT   (double)(2.2)
+#define   STATIC_CLOSE_POSITIVE_POINT   (double)(2.8)
+#define   STATIC_WIDE_STEP      (double)(0.04)
+#define   STATIC_CLOSE_STEP     (double)(0.01)
+#define   STATIC_N_SWEEP        (int) ( 80)
 #define   STATIC_TIME_PAUSE     (double) (1.0)
 #define   STATIC_TIME_DELAY     (double)(0.5)
 #define   STATIC_TIME_FINAL     (double) (        4.0)
@@ -69,7 +71,7 @@
 
 //#define   LIN_VOLT_START        (double)(2.75)
 //#define   LIN_GYRO_START        (double)(36.912)
-#define   LIN_V_DEADZONE        (double) (0.05)
+#define     LIN_V_DEADZONE        (double) (0.05)
 //#define   LIN_COEFFI_POSITIVE_A (double)(-180.3315)
 //#define   LIN_COEFFI_POSITIVE_B (double)(2117.6102)
 //#define   LIN_COEFFI_POSITIVE_C (double)(-4421.7240)

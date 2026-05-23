@@ -21,13 +21,12 @@ function Vali_plot(signal_type)
             Wgyro(:,idx) = Dataset(:,5);
 
         else
-            % 파일이 없을 경우 경고 메시지 출력 (디버깅 용도)
-            fprintf('파일을 찾을 수 없습니다: %s\n', filename);
+            % fprintf('파일을 찾을 수 없습니다: %s\n', filename);  % 파일이 없을 경우 경고 메시지 출력 (디버깅 용도)
         end
     end
 
     % 3. Data Processing - normalize
-    Vcmd = normalize(Vcmd, 'range', [-538 538]);
+    Vcmd = normalize(Vcmd, 'range', [-510 510]);
     % Wgyro = normalize(Wgyro, 'range', [-1 1]);
 
     % 3-1. MA
