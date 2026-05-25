@@ -18,7 +18,8 @@ function plot_file(filename, X, Y)
     figure(); hold on;
 
     colName = Labels{2};% at using array use {}
-
+    
+    % MODIFY!
     plot(Dataset(:,X), Dataset(:,Y), 'o-', 'LineWidth', 1.2, 'MarkerSize', 3, 'DisplayName', colName);
 
      %4. Labling

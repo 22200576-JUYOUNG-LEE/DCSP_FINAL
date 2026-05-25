@@ -4,7 +4,7 @@ double freq = 0.0;
 
 static double Bode_sin(DynState s)
 {
-    return BODE_SIN_AMPLITUDE * sin(2.0 * UNIT_PI * freq * (s.Time - BODE_SIN_TIME_1));
+    return BODE_SIN_AMPLITUDE * sin(2.0 * UNIT_PI * freq * (s.Time));
 }
 
 void BodeMag(void)

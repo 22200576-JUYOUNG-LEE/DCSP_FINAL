@@ -26,7 +26,7 @@ function Vali_plot(signal_type)
     end
 
     % 3. Data Processing - normalize
-    Vcmd = normalize(Vcmd, 'range', [-510 510]);
+    Vcmd = normalize(Vcmd, 'range', [-925.4 925.4]);
     % Wgyro = normalize(Wgyro, 'range', [-1 1]);
 
     % 3-1. MA
@@ -39,9 +39,6 @@ function Vali_plot(signal_type)
     Wgyro_mean = mean(Wgyro, 2, 'omitnan');
     Wgyro_std  = std(Wgyro, 0, 2, 'omitnan');
 
-    % % 3-3 y axis shift
-    % Wgyro_mean = Wgyro_mean - 0.02;
-
     
     % 3. Plot Dataset (1열: Time, 6열: Wgyro)
     figure(); hold on;
@@ -53,10 +50,18 @@ function Vali_plot(signal_type)
 
     %4. Labling
     xlabel('Time[sec]','FontWeight','bold');
-    ylabel('normalized V_{cmd}[V] vs normalized \omega_{gyro}[rad/sec]','FontWeight','bold');
+    ylabel('normalized V_{cmd}[V] vs \omega_{gyro}[rad/sec]','FontWeight','bold');
     
     title('Validation V_{cmd} vs \omega_{gyro}');
     legend('show', 'Location', 'best');
     hold off; grid on;
 
+    figure(); 
+    plot(Time, Vcmd_mean - Wgyro_mean,'b-', 'LineWidth',1.4);
+    xlabel('Time[sec]','FontWeight','bold');
+    ylabel('Error function normalized V_{cmd}[V] - \omega_{gyro}[rad/sec]','FontWeight','bold');
+    title("Error function normalized", 'FontWeight','bold');
+    grid on;
+
+ 
 end

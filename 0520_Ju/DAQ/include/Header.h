@@ -52,12 +52,13 @@
 #define   OFFSET_FILE           (const char*)( "Offset.out")
 
 //#define   STATIC_V_STEP         (double) (     0.05)//       <- 
-#define   STATIC_NEGATIVE_START_POINT   (double)(2.35)
-#define   STATIC_POSITIVE_START_POINT   (double)(2.65)
+#define   STATIC_ITER_MAX       (int)(5)
+#define   STATIC_NEGATIVE_START_POINT   (double)(2.3)
+#define   STATIC_POSITIVE_START_POINT   (double)(2.7)
 #define   STATIC_CLOSE_NEGATIVE_POINT   (double)(2.2)
 #define   STATIC_CLOSE_POSITIVE_POINT   (double)(2.8)
 #define   STATIC_WIDE_STEP      (double)(0.02)
-#define   STATIC_CLOSE_STEP     (double)(0.01)
+#define   STATIC_CLOSE_STEP     (double)(0.02)
 #define   STATIC_N_SWEEP        (int)       ( 80)
 #define   STATIC_TIME_PAUSE     (double)    (1.0)
 #define   STATIC_TIME_DELAY     (double)    (0.5)
@@ -72,33 +73,33 @@
 #define   LIN_V_DEADZONE        (double) (0.05)
 
 #define   VALID_DIR             (const char*)("Validation")
-#define   VALID_ITER_MAX        (int) (18)
+#define   VALID_ITER_MAX        (int) (8)
 
 #define   VALID_TRI_TIME_PAUSE  (double) (2.0)
-#define   VALID_TRI_TIME_PERIOD (double)(              5.0)
+#define   VALID_TRI_TIME_PERIOD (double)(10.0)
 #define   VALID_TRI_SLOPE       (double)(0.7 / VALID_TRI_TIME_PERIOD)
 #define   VALID_TRI_TIME_POINT1 (double)(              1.0)
 #define   VALID_TRI_TIME_POINT2 (double)(VALID_TRI_TIME_POINT1+VALID_TRI_TIME_PERIOD)
 #define   VALID_TRI_TIME_POINT3 (double)(VALID_TRI_TIME_POINT2+ 2.0* VALID_TRI_TIME_PERIOD)
-#define   VALID_TRI_TIME_FINAL  (double)(             26.0)
+#define   VALID_TRI_TIME_FINAL  (double)(VALID_TRI_TIME_POINT3 + VALID_TRI_TIME_PERIOD + 1)
 
 #define   VALID_SIN_TIME_PAUSE  (double)(1.0)
 #define   VALID_SIN_AMPLITUDE   (double)(0.7)
-#define   VALID_SIN_TIME_FINAL  (double)(             16.0)
+#define   VALID_SIN_TIME_FINAL  (double)(VALID_SIN_TIME_2 +1)
 #define   VALID_SIN_TIME_1      (double)(1.0)
-#define   VALID_SIN_FREQ        (double)(0.07)
+#define   VALID_SIN_FREQ        (double)(0.03)
 #define   VALID_SIN_TIME_2      (double)(VALID_SIN_TIME_1+ 1 / VALID_SIN_FREQ)
 
 #define   BODE_DIR              (const char*)("BodeMag")
 #define   BODE_TIME_PAUSE       (double)(2.0)
 #define   BODE_ITER_START       (int) (0)
-#define   BODE_ITER_MAX         (int) (30)
+#define   BODE_ITER_MAX         (int) (50)
 
-#define   BODE_SIN_FREQ_STEP    (double)(0.2)
-#define   BODE_SIN_TIME_FINAL   (double)(6.0)
-#define   BODE_SIN_TIME_1       (double)(1.0)
-#define   BODE_SIN_TIME_2       (double)(5.0)
-#define   BODE_SIN_AMPLITUDE    (double)(1.0)
+#define   BODE_SIN_FREQ_STEP    (double)(0.1)
+#define   BODE_SIN_TIME_FINAL   (double)(5)
+//#define   BODE_SIN_TIME_1       (double)(1.0)
+//#define   BODE_SIN_TIME_2       (double)(5.0)
+#define   BODE_SIN_AMPLITUDE    (double)(0.7)
 
 
 typedef enum {
@@ -164,7 +165,7 @@ void DAQ_Close();
 
 
 // 4. myMotor.c
-void StaticProperty(int Static_mode);
+void StaticProperty(int Static_mode, int Iter_num);
 void InitPath(void);
 
 

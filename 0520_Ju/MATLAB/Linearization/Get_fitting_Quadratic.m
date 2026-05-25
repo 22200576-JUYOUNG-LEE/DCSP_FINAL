@@ -7,10 +7,10 @@ function [coeff_pos, coeff_neg, pos_start, neg_start] = Get_fitting_Quadratic(fi
     Vc=data(:,1); %[V] 
     Wgyro=data(:,2); %[deg/sec]
 
-    pos_start = 2.70; pos_end = 4.00;
-    neg_start = 2.30; neg_end = 1.00;
+    pos_start = 2.77; pos_end = 3.97;
+    neg_start = 2.23; neg_end = 1.03;
 
-    OperPoint_Vc = 2.76;
+    OperPoint_Vc = pos_start;
     [~, OperPoint_idx] = min(abs(Vc - OperPoint_Vc));
     OperPoint_Wgyro = Wgyro(OperPoint_idx);
 

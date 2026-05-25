@@ -9,8 +9,22 @@ char OutFileName[N_NAME_BUFFER] = { 0 };
 
 double Static_Step(DynState s);
 void InitPath(void);
+void IterStaticProperty(int Static_mode);
 
-void StaticProperty(int Static_mode){
+void IterStaticProperty(int Static_mode) {
+    int idx = 0; 
+
+    for (idx = 0; idx < STATIC_ITER_MAX; idx++) {
+        printf("\n==============================\n");
+        printf("\t\tIteration: %d", idx);
+        printf("\n==============================\n");
+        StaticProperty(Static_mode, idx);
+    }
+
+}
+
+
+void StaticProperty(int Static_mode, int Iter_num){
     double      Vc_pos = 0.0;
     double      Vc_neg = 0.0;
 
@@ -49,6 +63,8 @@ void StaticProperty(int Static_mode){
         RUN_DAQ_mode = LINEAR;
     }
 
+    sprintf(OutDirName, "%s_iter%d.out", STATIC_DIR, Iter_num + 1);
+
     for (int mag = 0; mag < STATIC_N_SWEEP / 2; mag++) {
 
         for (int j = 0; j < 2; j++) {
@@ -83,7 +99,7 @@ void StaticProperty(int Static_mode){
             sprintf(OutFileName, "Static_Step_%.2f.out", Vcmd);
 
             RunDAQ(STATIC_TIME_FINAL, STATIC_DATA_DIR, OutFileName, Static_Step);
-            printf("\nVcmd: %.2f", Vcmd);
+            printf("\nVcmd: %.3f", Vcmd);
             printf("\nWgyro avg: %.4f \n", g_daqAvg.Wgyro);
 
             Summary_Vc_avg[idx_curr] =    g_daqAvg.Vcmd;
