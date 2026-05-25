@@ -9,14 +9,14 @@ char OutFileName[N_NAME_BUFFER] = { 0 };
 
 double Static_Step(DynState s);
 void InitPath(void);
-void IterStaticProperty(int Static_mode);
+
 
 void IterStaticProperty(int Static_mode) {
     int idx = 0; 
 
     for (idx = 0; idx < STATIC_ITER_MAX; idx++) {
         printf("\n==============================\n");
-        printf("\t\tIteration: %d", idx);
+        printf("\tIteration: %d", idx);
         printf("\n==============================\n");
         StaticProperty(Static_mode, idx);
     }

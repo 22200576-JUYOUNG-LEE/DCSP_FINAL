@@ -27,8 +27,8 @@ void RunMode(void)
 {
 
     switch (SelectOperatingMode()) {
-        case MODE_STATIC:        StaticProperty(NON_LINEAR);         break;
-        case MODE_STATIC_LINEAR: StaticProperty(LINEAR);             break;
+        case MODE_STATIC:        IterStaticProperty(NON_LINEAR);         break;
+        case MODE_STATIC_LINEAR: StaticProperty(LINEAR, LIN_ITER_MAX);             break;
         case MODE_VALIDATION:    StaticValidation();                 break;
         case MODE_BODE:          BodeMag();                          break;
         

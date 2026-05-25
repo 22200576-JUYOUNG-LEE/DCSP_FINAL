@@ -71,6 +71,7 @@
 #define   STATIC_SIGN_NEGATIVE  (int)(               1)
 
 #define   LIN_V_DEADZONE        (double) (0.05)
+#define   LIN_ITER_MAX          (int) (1)
 
 #define   VALID_DIR             (const char*)("Validation")
 #define   VALID_ITER_MAX        (int) (8)
@@ -165,6 +166,7 @@ void DAQ_Close();
 
 
 // 4. myMotor.c
+void IterStaticProperty(int Static_mode);
 void StaticProperty(int Static_mode, int Iter_num);
 void InitPath(void);
 
