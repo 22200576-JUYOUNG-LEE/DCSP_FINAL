@@ -1,13 +1,9 @@
 %% DC_PROJECT
 % 1. PLOT DATASET
-function [coeff_pos, coeff_neg, pos_start, neg_start] = Get_fitting_Quadratic(filename)
+function [coeff_pos, coeff_neg, pos_start, neg_start] = Get_fitting_Quadratic(Vc, Wgyro)
 
-    data=readmatrix(filename, 'NumHeaderLines', 1, "FileType","text");
 
-    Vc=data(:,1); %[V] 
-    Wgyro=data(:,2); %[deg/sec]
-
-    pos_start = 2.77; pos_end = 3.97;
+        pos_start = 2.77; pos_end = 3.97;
     neg_start = 2.23; neg_end = 1.03;
 
     OperPoint_Vc = pos_start;

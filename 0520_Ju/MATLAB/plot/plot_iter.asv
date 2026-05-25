@@ -33,7 +33,6 @@ function [X_mean, Y_mean]=plot_iter(filename, X, Y, itr)
     
     fprintf("Standard Deviation: %.4f\n", mean(Wgyro_std, 'omitnan')); 
 
-    X_mean=mean(Vc,2,'omitnan');
-    Y_mean=mean(Wgyro, 2, 'omitnan'); 
+    X_mean=mean(Vc,2,'' )
 
 end
