@@ -10,8 +10,8 @@ g_norm = g_exp / g_exp(1);
 g_initial=g_exp(1); 
 
 %% 2. Define Fit Range (1/10 to 1/3 of 4Hz Bandwidth)
-f_min = 1.2; 
-f_max = 4.0;
+f_min = 0.2; 
+f_max = 1.3;
 idx = find(f_exp >= f_min & f_exp <= f_max);
 
 
@@ -20,7 +20,7 @@ w = 2 * pi * f_exp(idx);
 
 %% 3. System Identification (invfreqs)
 
-[num, den] = invfreqs(h, w, 1, 2);
+[num, den] = invfreqs(h, w, 0, 1);
 sys_final = tf(num, den);
 
 figure;

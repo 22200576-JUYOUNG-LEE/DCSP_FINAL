@@ -1,55 +1,54 @@
 #include "Header.h"
+#define MAX_RATE 1400.0/1300.0 // [deg/sec]
 
 double OperPoint_Vc = 0.0, OperPoint_Wgyro = 0.0;
 double a1 = 0.0, a2 = 0.0;
 double b1 = 0.0, b2 = 0.0;
 double c1 = 0.0, c2 = 0.0;
+double d1 = 0.0, d2 = 0.0;
+double e1 = 0.0, e2 = 0.0;
+
 
 double a_deadZone = 0.0;
 double b_deadZone = 0.0;
 double c_deadZone = 0.0;
+double d_deadZone = 0.0; 
+
+
+#define CLOSE_DEADZONE 0.02
+#define CLOSE_DEADZONE_SLOPE 0.005
+
+
 
 double Linearization(double vin) {
+    double Vc = 0.0;
+    double w_input = vin;
 
-    double Vc = OperPoint_Vc;
+    // 1. Saturation implementation 
+    if (w_input > MAX_RATE) w_input = MAX_RATE;
+    else if (w_input < -MAX_RATE) w_input = -MAX_RATE;
 
-    double SlopeDeadZone = (OperPoint_Vc/ LIN_V_DEADZONE);
-    double linearSlope = (OperPoint_Wgyro / LIN_V_DEADZONE);
-
-    double w_ref = linearSlope * vin;
-    double discriminant = 0.0;
-
-    if (vin > LIN_V_DEADZONE) {
-
-        discriminant = b1 * b1 - 4.0 * a1 * (c1 - w_ref);
-
-        if (discriminant >= 0) Vc = (-b1 + sqrt(discriminant)) / (2.0 * a1);
+    // 2. No need of LIN_V_DZ
+    if (w_input >= LIN_V_DEADZONE) {
+        // 4th order: CW 
+        Vc = a1 * pow(w_input, 4) + b1 * pow(w_input, 3) + c1 * pow(w_input, 2) + d1 * w_input + e1;
     }
-    else if (vin < -LIN_V_DEADZONE) {
-
-        discriminant = b2 * b2 - 4.0 * a2 * (c2 - w_ref);
-
-        if (discriminant >= 0) Vc = (-b2 + sqrt(discriminant)) / (2.0 * a2);
+    else if (w_input <= -LIN_V_DEADZONE) {
+        // 4th order: CCW
+        Vc = a2 * pow(w_input, 4) + b2 * pow(w_input, 3) + c2 * pow(w_input, 2) + d2 * w_input + e2;
     }
     else {
-        //discriminant = b_deadZone * b_deadZone - 4.0 * a_deadZone * (c_deadZone - w_ref);
-
-        //if (discriminant >= 0) Vc = (-b_deadZone + sqrt(discriminant)) / (2.0 * a_deadZone);
+        // 3rd order: DEADZONE 
+        /*Vc = a_deadZone * pow(w_input, 3) + b_deadZone * pow(w_input, 2) + c_deadZone * w_input + d_deadZone;*/
         
-        double Vc_pos_start = 2.74;
-        double Vc_pos_end = 2.77;
+        if (w_input < LIN_V_DEADZONE && w_input >= CLOSE_DEADZONE) {
+            Vc = DAQ_V_STANDARD + 0.28 - 0.02 + (0.02 / 0.05) * w_input;
+        }
+        else if (w_input > -LIN_V_DEADZONE && w_input <= -CLOSE_DEADZONE) {
+            Vc = DAQ_V_STANDARD - 0.28 + 0.02 + (0.02 / 0.05) * w_input;
+        }
 
-        double Vc_neg_start = 2.25;
-        double Vc_neg_end = 2.23;
-        
-        if (vin > 0.01) Vc = Vc_pos_start + (Vc_pos_end - Vc_pos_start) / LIN_V_DEADZONE * vin;
-        else if (vin < -0.01) Vc = Vc_neg_start +(Vc_neg_end - Vc_neg_start) / LIN_V_DEADZONE * vin;
         else Vc = DAQ_V_STANDARD;
-         
-    
-        //Vc = -1080 * vin * vin* vin + 8.1 * vin + DAQ_V_STANDARD;
-
-        //Vc = DAQ_V_STANDARD;
     }
 
     return Vc;
@@ -57,6 +56,7 @@ double Linearization(double vin) {
 
 void ReadLinearCoefficent(void) {
     FILE* fp = fopen("../data/LIN_COEF.csv", "r");
+    char buffer[256];
 
     if (fp == NULL) {
         printf("ERROR: [IN Linearization] COULD NOT OPEN FILE!\n");
@@ -64,22 +64,25 @@ void ReadLinearCoefficent(void) {
         exit(1);
     }
 
-    fscanf(fp, "%lf,%lf", &OperPoint_Vc, &OperPoint_Wgyro);
-    fscanf(fp, "%lf,%lf", &a1, &a2);
-    fscanf(fp, "%lf,%lf", &b1, &b2);
-    fscanf(fp, "%lf,%lf", &c1, &c2);
-
-    fclose(fp);
-
-    fp = fopen("../data/LIN_DZ_COEF.csv", "r");
-
-    if (fp == NULL) {
-        printf("ERROR: [IN Linearization] COULD NOT OPEN FILE!\n");
-        system("pause");
-        exit(1);
+    // 1st Row obtained: Operation points
+    if (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        sscanf(buffer, "%lf,%lf", &OperPoint_Wgyro, &OperPoint_Vc);
     }
 
-    fscanf(fp, "%lf,%lf,%lf", &a_deadZone, &b_deadZone, &c_deadZone);
+    // 2nd Row obtained: 5 cols
+    if (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        sscanf(buffer, "%lf,%lf,%lf,%lf,%lf", &a1, &b1, &c1, &d1, &e1);
+    }
+
+    // 3rd Row obtained: 5 cols
+    if (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        sscanf(buffer, "%lf,%lf,%lf,%lf,%lf", &a2, &b2, &c2, &d2, &e2);
+    }
+
+    // 4th Row obtaeind: 4 cols 
+    if (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        sscanf(buffer, "%lf,%lf,%lf,%lf", &a_deadZone, &b_deadZone, &c_deadZone, &d_deadZone);
+    }
 
     fclose(fp);
 }

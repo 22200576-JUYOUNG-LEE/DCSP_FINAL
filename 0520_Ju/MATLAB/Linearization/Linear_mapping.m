@@ -1,78 +1,54 @@
-function Linear_mapping(filename)
-% Data loading
+function Linear_mapping(filename, Vc, Wgyro)
+% DATA 로딩
 data = readmatrix(filename, 'NumHeaderLines', 1, "FileType", "text");
-V_c = data(:, 1); 
-w_gyro = data(:, 2); 
+V_c    = data(:,1);
+w_gyro = data(:,2);
 
+Linslope = 1300;
 
-[coeff_pos, coeff_neg, pos_start, neg_start] = Get_fitting_Quadratic(filename);
+% Coefficients as
+[coeff_pos, coeff_neg, coeff_dz, V_pos_start, V_neg_start] = Get_fitting_Quadratic(Vc, Wgyro);
 
+% 포화 한계값도 vin 기준으로 변환
+MAX_RATE = 1400 / Linslope; 
 
-a = coeff_pos(1);   b = coeff_pos(2);   c = coeff_pos(3);   
-a1 = coeff_neg(1);  b1 = coeff_neg(2);  c1 = coeff_neg(3);   
+Vc_model = zeros(size(w_gyro));
 
-% automatically finding positive & negative points of starting. 
-pos_indices = V_c > pos_start;
-real_pos_start = min(V_c(pos_indices)); 
+% ============================================================
+% Linear mapping 
+% ============================================================
+for i = 1:length(w_gyro) 
+    
+    % 입력 속도 요소를 제어 입력 v_in으로 변환
+    v_in = w_gyro(i) / Linslope;
+    
+    % SATURATION (vin 기준 포화 제한)
+    if v_in > MAX_RATE
+        v_in = MAX_RATE;
+    elseif v_in < -MAX_RATE
+        v_in = -MAX_RATE;
+    end
 
-
-mod_real_pos_start=2.76;
-mod_real_neg_start=2.24;
-
-deadzone_pos_start=2.74;
-deadzone_nge_start=2.26;
-
-neg_indices = V_c < neg_start;
-real_neg_start = max(V_c(neg_indices)); 
-
-
-w_pos_start = a * (mod_real_pos_start)^2 + b * mod_real_pos_start + c;
-w_neg_start = a1 * (mod_real_neg_start)^2 + b1 * mod_real_neg_start + c1;
-
-
-% Three point mapping
-V_dz = [mod_real_neg_start; 2.5; mod_real_pos_start];
-W_dz = [-55.6;    0;   56.8];
-
-A_dz = [V_dz.^2, V_dz, ones(3,1)];
-coeff_dz = A_dz \ W_dz;  % [a_dz, b_dz, c_dz]
-
-a_dz = coeff_dz(1);
-b_dz = coeff_dz(2);
-c_dz = coeff_dz(3);
-% ====================================================================
-
-data_matrix = [a_dz, b_dz, c_dz];
-
-writematrix(data_matrix, '..\data\LIN_DZ_COEF.csv');
-
-
-w_model = zeros(size(V_c)); 
-for i = 1:length(V_c)
-    if V_c(i) >= mod_real_pos_start 
-        
-        w_model(i) = a*(V_c(i))^2 + b*V_c(i) + c;
-    elseif V_c(i) <= mod_real_neg_start 
-       
-        w_model(i) = a1*(V_c(i))^2 + b1*V_c(i) + c1;
-
-    elseif V_c(i) <= deadzone_pos_start && V_c(i) >= 2.5 + 0.01
-        w_model(i) = 2.74 + (2.76-2.74)/(0.04) *V_c(i);
- 
-    elseif V_c(i) >= deadzone_nge_start && V_c(i) <= 2.5 - 0.01
-        w_model(i) = 2.24 + (2.26 - 2.24) / 0.04 * V_c(i);
+    % 1. 정방향 구간 (vin 직접 대입)
+    if v_in >= V_pos_start
+        Vc_model(i) = polyval(coeff_pos, v_in);
+    % 2. 역방향 구간
+    elseif v_in <= V_neg_start
+        Vc_model(i) = polyval(coeff_neg, v_in);
+    % 3. 데드존 구간 (3차 피팅)
     else
-        w_model(i) = 2.5;
+        Vc_model(i) = polyval(coeff_dz, v_in);
     end
 end
 
-figure;
-plot(w_gyro, V_c, 'o', 'MarkerEdgeColor', '#0072BD', 'MarkerFaceColor', '#0072BD', 'MarkerSize', 4);
-hold on;
-% plot(w_model, V_c, 'r-', 'LineWidth', 2);
-xlabel('\omega_{gyro} [deg/s]');
-ylabel('Command Voltage V_c [V]');
-title('Inverse Property (역함수)');
-% legend('Experimental Data (deg/s)', 'Linearized Model (deg/s)');
-grid on;
+% ============================================================
+% 시각화
+% ============================================================
+figure(); hold on; grid on; box on;
+plot(w_gyro, V_c, 'b.', 'LineWidth', 1.5, 'DisplayName', 'Experimental Data');
+plot(w_gyro, Vc_model, 'r-', 'LineWidth', 2, 'DisplayName', 'Mapped Model');
+xlabel('\omega_{gyro} [deg/sec]', 'FontWeight', 'bold');
+ylabel('V_c [V]', 'FontWeight', 'bold');
+title('Polynomial Mapping : V_c = f(v_{in})');
+legend('Location', 'best');
 end

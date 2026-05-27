@@ -1,42 +1,65 @@
-%% DC_PROJECT
-% 1. PLOT DATASET
-function [coeff_pos, coeff_neg, pos_start, neg_start] = Get_fitting_Quadratic(Vc, Wgyro)
+function [coeff_pos, coeff_neg, coeff_dz, V_pos_start, V_neg_start] = Get_fitting_Quadratic(Vc, Wgyro)
+    % =========================================================
+    % SYSTEM PARA
+    % =========================================================
+    Linslope  = 1300;     % 변환 상수 K
+    order     = 4;        % 정/역방향 4차 고정
+    dz_order  = 1;        % 데드존 3차 고정
 
+    % 오리지널 속도 경계값 [deg/s]
+    pos_start = 64.87; %<--    
+    pos_end   = 941.97;   
+    neg_start = -67.2453; 
+    neg_end   = -905.685; 
 
-        pos_start = 2.77; pos_end = 3.97;
-    neg_start = 2.23; neg_end = 1.03;
+    % 입력 제어 명령(vin) 기준의 경계값으로 변환
+    V_pos_start = pos_start / Linslope;
+    V_pos_end   = pos_end / Linslope;
+    V_neg_start = neg_start / Linslope;
+    V_neg_end   = neg_end / Linslope;
 
-    OperPoint_Vc = pos_start;
-    [~, OperPoint_idx] = min(abs(Vc - OperPoint_Vc));
-    OperPoint_Wgyro = Wgyro(OperPoint_idx);
+    % 
+    vin_data = Wgyro / Linslope; 
 
-    pos_region = (Vc >= pos_start) & (Vc <= pos_end); 
-    neg_region = (Vc >= neg_end) & (Vc <= neg_start);
+    % (Operating Point) 
+    OperPoint_Vcmd = V_pos_start;
+    [~, OperPoint_idx] = min(abs(vin_data - OperPoint_Vcmd));
+    OperPoint_Vc = Vc(OperPoint_idx);
 
+    % =========================================================
+    % 구간 분할 (Region Selection - vin_data 기준)
+    % =========================================================
+    pos_region = (vin_data >= V_pos_start) & (vin_data <= V_pos_end);
+    neg_region = (vin_data >= V_neg_end) & (vin_data <= V_neg_start);
+    dz_region  = (vin_data <= V_pos_start) & (vin_data >= V_neg_start); 
 
-    Vc_pos=Vc(pos_region);
-    Wgyro_pos=Wgyro(pos_region); 
+    % =========================================================
+    % 다항식 피팅 (X축을 vin_data로 설정하여 계수 추출)
+    % =========================================================
+    coeff_pos = polyfit(vin_data(pos_region), Vc(pos_region), order);
+    coeff_neg = polyfit(vin_data(neg_region), Vc(neg_region), order);
+    coeff_dz  = polyfit(vin_data(dz_region), Vc(dz_region), dz_order); 
 
-    A_pos=[Vc_pos.^2, Vc_pos, ones(size(Vc_pos))];
-    B_pos=Wgyro_pos; 
+    % =========================================================
+    % 데이터 저장 (LIN_COEF.csv)
+    % =========================================================
+    coeff_dz_data = nan(1, length(coeff_pos)); 
+    coeff_dz_data(1:length(coeff_dz)) = coeff_dz;
+    
+    header_row = nan(1, length(coeff_pos));
+    header_row(1:2) = [OperPoint_Vcmd, OperPoint_Vc];
+    data_matrix = [header_row; coeff_pos; coeff_neg; coeff_dz_data];
+    writematrix(data_matrix, '..\data\LIN_COEF.csv'); 
 
-    coeff_pos = A_pos \ B_pos; 
-
-    Vc_neg = Vc(neg_region);
-    Wgyro_neg = Wgyro(neg_region);
-
-    A_neg = [Vc_neg.^2, Vc_neg, ones(size(Vc_neg))];
-    B_neg = Wgyro_neg;
-
-coeff_neg = A_neg \ B_neg;
-
-data_matrix = [OperPoint_Vc, OperPoint_Wgyro; coeff_pos, coeff_neg];
-
-writematrix(data_matrix, '..\data\LIN_COEF.csv');
-
-% % conclusion: 
-% fprintf('Positive region: W = %.4f*V^2 + %.4f*V + %.4f\n', coeff_pos);
-% fprintf('Negative region: W = %.4f*V^2 + %.4f*V + %.4f\n', coeff_neg);
-% 
-
+    % =========================================================
+    % 시각화 (Plot)
+    % =========================================================
+    figure(); hold on; grid on; box on;
+    plot(vin_data, Vc, 'b.', 'LineWidth', 1.5, 'DisplayName', 'Dataset');
+    plot(vin_data(pos_region), polyval(coeff_pos, vin_data(pos_region)), 'r-', 'LineWidth', 2, 'DisplayName', 'Positive Fit');
+    plot(vin_data(neg_region), polyval(coeff_neg, vin_data(neg_region)), 'm-', 'LineWidth', 2, 'DisplayName', 'Negative Fit');
+    plot(vin_data(dz_region), polyval(coeff_dz, vin_data(dz_region)), 'g-', 'LineWidth', 2, 'DisplayName', 'Deadzone Fit (3rd)');
+    xlabel('Control Input v_{in}', 'FontWeight', 'bold');
+    ylabel('V_c [V]', 'FontWeight', 'bold');
+    legend('Location', 'best');
 end

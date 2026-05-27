@@ -63,7 +63,7 @@ void StaticProperty(int Static_mode, int Iter_num){
         RUN_DAQ_mode = LINEAR;
     }
 
-    sprintf(OutDirName, "%s_iter%d.out", STATIC_DIR, Iter_num + 1);
+    //sprintf(OutDirName, "%s_iter%d.out", STATIC_DIR, Iter_num + 1);
 
     for (int mag = 0; mag < STATIC_N_SWEEP / 2; mag++) {
 
@@ -117,4 +117,4 @@ double Static_Step(DynState s) {
 void InitPath(void) {
     memset(OutFileName, 0, N_NAME_BUFFER);
     memset(OutDirName, 0, N_NAME_BUFFER);
-}
+} 

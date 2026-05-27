@@ -26,11 +26,11 @@
 
 #define   GYRO_V2RADS     (double) (1000.0 * UNIT_PI) / (0.67 * 180.0)
 
-#define   DEVICE_NUM      (int)    (                6)
+#define   DEVICE_NUM      (int)    (                4)
 #define   NUM_A0_CHANNELS (int)    (                2)
 #define   NUM_AI_CHANNELS (int)    (                4) 
 
-#define   N_MAX_BUFFER    (int)    (            10000)
+#define   N_MAX_BUFFER    (int)    (            100000)
 
 #define   DAQ_V_STOP       (double) (              0.0)
 #define   DAQ_V_START      (double) (              5.0)
@@ -51,7 +51,7 @@
 #define   OFFSET_DIR            (const char*)(     "Offset")
 #define   OFFSET_FILE           (const char*)( "Offset.out")
 
-//#define   STATIC_V_STEP         (double) (     0.05)//       <- 
+//#define   STATIC_V_STEP         (double) (     0.05)//       
 #define   STATIC_ITER_MAX       (int)(5)
 #define   STATIC_NEGATIVE_START_POINT   (double)(2.3)
 #define   STATIC_POSITIVE_START_POINT   (double)(2.7)
@@ -74,22 +74,24 @@
 #define   LIN_ITER_MAX          (int) (1)
 
 #define   VALID_DIR             (const char*)("Validation")
-#define   VALID_ITER_MAX        (int) (8)
+#define   VALID_ITER_MAX        (int) (1)
 
 #define   VALID_TRI_TIME_PAUSE  (double) (2.0)
-#define   VALID_TRI_TIME_PERIOD (double)(10.0)
+#define   VALID_TRI_TIME_PERIOD (double)(30.0)
 #define   VALID_TRI_SLOPE       (double)(0.7 / VALID_TRI_TIME_PERIOD)
 #define   VALID_TRI_TIME_POINT1 (double)(              1.0)
 #define   VALID_TRI_TIME_POINT2 (double)(VALID_TRI_TIME_POINT1+VALID_TRI_TIME_PERIOD)
 #define   VALID_TRI_TIME_POINT3 (double)(VALID_TRI_TIME_POINT2+ 2.0* VALID_TRI_TIME_PERIOD)
-#define   VALID_TRI_TIME_FINAL  (double)(VALID_TRI_TIME_POINT3 + VALID_TRI_TIME_PERIOD + 1)
+#define   VALID_TRI_TIME_POINT4 (double)(VALID_TRI_TIME_POINT3+ 2.0* VALID_TRI_TIME_PERIOD)
+#define   VALID_TRI_TIME_POINT5 (double)(VALID_TRI_TIME_POINT4+ 2.0* VALID_TRI_TIME_PERIOD)
+#define   VALID_TRI_TIME_FINAL  (double)(VALID_TRI_TIME_POINT5 + VALID_TRI_TIME_PERIOD + 1)
 
 #define   VALID_SIN_TIME_PAUSE  (double)(1.0)
 #define   VALID_SIN_AMPLITUDE   (double)(0.7)
 #define   VALID_SIN_TIME_FINAL  (double)(VALID_SIN_TIME_2 +1)
 #define   VALID_SIN_TIME_1      (double)(1.0)
-#define   VALID_SIN_FREQ        (double)(0.03)
-#define   VALID_SIN_TIME_2      (double)(VALID_SIN_TIME_1+ 1 / VALID_SIN_FREQ)
+#define   VALID_SIN_FREQ        (double)(0.01)
+#define   VALID_SIN_TIME_2      (double)(VALID_SIN_TIME_1+ 3 / VALID_SIN_FREQ)
 
 #define   BODE_DIR              (const char*)("BodeMag")
 #define   BODE_TIME_PAUSE       (double)(2.0)
@@ -97,7 +99,7 @@
 #define   BODE_ITER_MAX         (int) (50)
 
 #define   BODE_SIN_FREQ_STEP    (double)(0.1)
-#define   BODE_SIN_TIME_FINAL   (double)(5)
+#define   BODE_SIN_TIME_FINAL   (double)(10)
 //#define   BODE_SIN_TIME_1       (double)(1.0)
 //#define   BODE_SIN_TIME_2       (double)(5.0)
 #define   BODE_SIN_AMPLITUDE    (double)(0.7)

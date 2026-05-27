@@ -10,15 +10,18 @@ nrmse_list  = [];
 amp_ratio_list  = [];
 phase_err_list  = [];
 
-for f_val = 1.0:0.2:3.0
+for f_val = 0.2:0.2:2.0
     validation_fn = sprintf('%sBodeMag_sin_freq%.2f.out', path, f_val);
     if ~isfile(validation_fn), continue; end
 
     %% 1. Read raw data
     val_data = readmatrix(validation_fn, 'FileType', 'text', 'NumHeaderLines', 1);
-    t_raw = val_data(:, 1);
+    t_old = val_data(:, 1);
     u_raw = val_data(:, 2);   % Vcmd [V]
     y_raw = val_data(:, 5);   % Wgyro [deg/s]
+    
+    t_raw = linspace(t_old(1), t_old(end), length(u_raw));
+        
 
     %% 2. Simulate
     y_sim = lsim(sys_final, u_raw, t_raw) * g_initial;

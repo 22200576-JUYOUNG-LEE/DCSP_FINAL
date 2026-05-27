@@ -26,13 +26,13 @@ function Vali_plot(signal_type)
     end
 
     % 3. Data Processing - normalize
-    Vcmd = normalize(Vcmd, 'range', [-925.4 925.4]);
+    Vcmd = normalize(Vcmd, 'range', [-910 910]);
     % Wgyro = normalize(Wgyro, 'range', [-1 1]);
 
     % 3-1. MA
-    window_size = 10;
-    Vcmd = movmean(Vcmd, window_size, 1);  
-    Wgyro = movmean(Wgyro, window_size, 1);
+    % window_size = 10;
+    % Vcmd = movmean(Vcmd, window_size, 1);  
+    % Wgyro = movmean(Wgyro, window_size, 1);
 
     % 3-2. mean 
     Vcmd_mean = mean(Vcmd, 2, 'omitnan'); % 2는 열 쪽으로 평균 낸다는 

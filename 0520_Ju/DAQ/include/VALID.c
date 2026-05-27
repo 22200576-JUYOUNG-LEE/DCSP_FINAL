@@ -31,7 +31,10 @@ double Valid_triangle(DynState s)
     if (s.Time < VALID_TRI_TIME_POINT1) return 0.0;
     else if (s.Time < VALID_TRI_TIME_POINT2) return s.Vcmd + VALID_TRI_SLOPE * SAMPLING_TIME;
     else if (s.Time < VALID_TRI_TIME_POINT3) return s.Vcmd - VALID_TRI_SLOPE * SAMPLING_TIME;
+    else if (s.Time < VALID_TRI_TIME_POINT4) return s.Vcmd + VALID_TRI_SLOPE * SAMPLING_TIME;
+    else if (s.Time < VALID_TRI_TIME_POINT5) return s.Vcmd - VALID_TRI_SLOPE * SAMPLING_TIME;
     else if (s.Time < VALID_TRI_TIME_FINAL)  return s.Vcmd + VALID_TRI_SLOPE * SAMPLING_TIME;
+
     else                                     return 0.0;
 }
 
