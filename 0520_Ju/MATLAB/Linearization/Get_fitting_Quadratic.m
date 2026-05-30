@@ -7,10 +7,10 @@ function [coeff_pos, coeff_neg, coeff_dz, V_pos_start, V_neg_start] = Get_fittin
     dz_order  = 1;        % 데드존 3차 고정
 
     % 오리지널 속도 경계값 [deg/s]
-    pos_start = 64.87; %<--    
-    pos_end   = 941.97;   
-    neg_start = -67.2453; 
-    neg_end   = -905.685; 
+    pos_start = 10.26; %<--    
+    pos_end   = 1138;   
+    neg_start = -23.37; 
+    neg_end   = -1128; 
 
     % 입력 제어 명령(vin) 기준의 경계값으로 변환
     V_pos_start = pos_start / Linslope;
@@ -58,7 +58,7 @@ function [coeff_pos, coeff_neg, coeff_dz, V_pos_start, V_neg_start] = Get_fittin
     plot(vin_data, Vc, 'b.', 'LineWidth', 1.5, 'DisplayName', 'Dataset');
     plot(vin_data(pos_region), polyval(coeff_pos, vin_data(pos_region)), 'r-', 'LineWidth', 2, 'DisplayName', 'Positive Fit');
     plot(vin_data(neg_region), polyval(coeff_neg, vin_data(neg_region)), 'm-', 'LineWidth', 2, 'DisplayName', 'Negative Fit');
-    plot(vin_data(dz_region), polyval(coeff_dz, vin_data(dz_region)), 'g-', 'LineWidth', 2, 'DisplayName', 'Deadzone Fit (3rd)');
+    % plot(vin_data(dz_region), polyval(coeff_dz, vin_data(dz_region)), 'g-', 'LineWidth', 2, 'DisplayName', 'Deadzone Fit (3rd)');
     xlabel('Control Input v_{in}', 'FontWeight', 'bold');
     ylabel('V_c [V]', 'FontWeight', 'bold');
     legend('Location', 'best');

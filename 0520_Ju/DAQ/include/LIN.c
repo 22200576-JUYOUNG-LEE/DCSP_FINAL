@@ -16,7 +16,6 @@ double d_deadZone = 0.0;
 
 
 #define CLOSE_DEADZONE 0.02
-#define CLOSE_DEADZONE_SLOPE 0.005
 
 
 
@@ -38,17 +37,7 @@ double Linearization(double vin) {
         Vc = a2 * pow(w_input, 4) + b2 * pow(w_input, 3) + c2 * pow(w_input, 2) + d2 * w_input + e2;
     }
     else {
-        // 3rd order: DEADZONE 
-        /*Vc = a_deadZone * pow(w_input, 3) + b_deadZone * pow(w_input, 2) + c_deadZone * w_input + d_deadZone;*/
-        
-        if (w_input < LIN_V_DEADZONE && w_input >= CLOSE_DEADZONE) {
-            Vc = DAQ_V_STANDARD + 0.28 - 0.02 + (0.02 / 0.05) * w_input;
-        }
-        else if (w_input > -LIN_V_DEADZONE && w_input <= -CLOSE_DEADZONE) {
-            Vc = DAQ_V_STANDARD - 0.28 + 0.02 + (0.02 / 0.05) * w_input;
-        }
-
-        else Vc = DAQ_V_STANDARD;
+        Vc = DAQ_V_STANDARD;
     }
 
     return Vc;

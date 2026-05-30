@@ -1,6 +1,6 @@
 function [freqs, gains, phases] = generate_bode_plot(data_dir)
     % Define frequency range as per your files
-    search_freqs = 0:0.1:4.9; 
+    search_freqs = 0:0.1:1.5; 
     
     valid_freqs = [];
     gains_raw = [];
@@ -25,7 +25,7 @@ function [freqs, gains, phases] = generate_bode_plot(data_dir)
         c_in = H \ u;
         A_in = norm(c_in(1:2));
         phi_in = atan2(c_in(2), c_in(1));
-        
+
         c_out = H \ y;
         A_out = norm(c_out(1:2));
         phi_out = atan2(c_out(2), c_out(1));

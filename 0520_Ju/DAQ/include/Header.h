@@ -26,7 +26,7 @@
 
 #define   GYRO_V2RADS     (double) (1000.0 * UNIT_PI) / (0.67 * 180.0)
 
-#define   DEVICE_NUM      (int)    (                4)
+#define   DEVICE_NUM      (int)    (                6)
 #define   NUM_A0_CHANNELS (int)    (                2)
 #define   NUM_AI_CHANNELS (int)    (                4) 
 
@@ -41,17 +41,19 @@
 
 #define CAL_AVG(num_data, Ybar_pre, Y) \
     (((1.0 - 1.0 / (num_data)) * (Ybar_pre)) + ((1.0 / (num_data)) * (Y)))
+#define VOLT2DEG(Vpoten) \
+    (Vpoten * (SCALE_REV2DEG) / V_POTEN - 180.0)
 
 
 // RUNNING DEFINE
 #define   NON_LINEAR            (int) (0)
 #define   LINEAR                (int) (1)
+#define   USER_INPUT            (int) (2)
 
 #define   OFFSET_TIME           (double) (              5.0)
 #define   OFFSET_DIR            (const char*)(     "Offset")
 #define   OFFSET_FILE           (const char*)( "Offset.out")
-
-//#define   STATIC_V_STEP         (double) (     0.05)//       
+      
 #define   STATIC_ITER_MAX       (int)(5)
 #define   STATIC_NEGATIVE_START_POINT   (double)(2.3)
 #define   STATIC_POSITIVE_START_POINT   (double)(2.7)
@@ -70,11 +72,11 @@
 #define   STATIC_SIGN_POSITIVE  (int)(               0)
 #define   STATIC_SIGN_NEGATIVE  (int)(               1)
 
-#define   LIN_V_DEADZONE        (double) (0.05)
+#define   LIN_V_DEADZONE        (double) (0.02)
 #define   LIN_ITER_MAX          (int) (1)
 
 #define   VALID_DIR             (const char*)("Validation")
-#define   VALID_ITER_MAX        (int) (1)
+#define   VALID_ITER_MAX        (int) (3)
 
 #define   VALID_TRI_TIME_PAUSE  (double) (2.0)
 #define   VALID_TRI_TIME_PERIOD (double)(30.0)
@@ -93,16 +95,19 @@
 #define   VALID_SIN_FREQ        (double)(0.01)
 #define   VALID_SIN_TIME_2      (double)(VALID_SIN_TIME_1+ 3 / VALID_SIN_FREQ)
 
+#define   BODE_ITER_MAX         (int) (15)
 #define   BODE_DIR              (const char*)("BodeMag")
 #define   BODE_TIME_PAUSE       (double)(2.0)
 #define   BODE_ITER_START       (int) (0)
-#define   BODE_ITER_MAX         (int) (50)
 
 #define   BODE_SIN_FREQ_STEP    (double)(0.1)
 #define   BODE_SIN_TIME_FINAL   (double)(10)
-//#define   BODE_SIN_TIME_1       (double)(1.0)
-//#define   BODE_SIN_TIME_2       (double)(5.0)
 #define   BODE_SIN_AMPLITUDE    (double)(0.7)
+
+#define   POTEN_FINAL_TIME      (double)(8.0)
+#define   POTEN_FILE            (const char*)("Poten.out")
+#define   POTEN_DATA_DIR        (const char*)("Poten_data") 
+#define   POTEN_EPS             (double)(1.0)
 
 
 typedef enum {
@@ -110,8 +115,10 @@ typedef enum {
     MODE_STATIC_LINEAR  = 2,
     MODE_VALIDATION     = 3, 
     MODE_BODE           = 4,
+    MODE_POTEN          = 5,
+    MODE_FORMAT         = 6,
 
-    N_MODE              = 5,
+    N_MODE              = 6,
 } Mode;
 
 extern TaskHandle   taskAI;
@@ -182,6 +189,11 @@ void ReadLinearCoefficent(void);
 
 // 6. myBode.c
 void BodeMag();
+
+//7. Potien.c
+void Potentio();
+void Format();
+double FORMAT_func(DynState s);
 
 
 #endif

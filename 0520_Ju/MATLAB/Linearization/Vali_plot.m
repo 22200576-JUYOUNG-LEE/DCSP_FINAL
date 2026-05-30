@@ -26,13 +26,13 @@ function Vali_plot(signal_type)
     end
 
     % 3. Data Processing - normalize
-    Vcmd = normalize(Vcmd, 'range', [-910 910]);
+    Vcmd = normalize(Vcmd, 'range', [-1300.*0.7 1300.*0.7]);
     % Wgyro = normalize(Wgyro, 'range', [-1 1]);
 
     % 3-1. MA
-    % window_size = 10;
-    % Vcmd = movmean(Vcmd, window_size, 1);  
-    % Wgyro = movmean(Wgyro, window_size, 1);
+    window_size = 10;
+    Vcmd = movmean(Vcmd, window_size, 1);  
+    Wgyro = movmean(Wgyro, window_size, 1);
 
     % 3-2. mean 
     Vcmd_mean = mean(Vcmd, 2, 'omitnan'); % 2는 열 쪽으로 평균 낸다는 
@@ -56,12 +56,12 @@ function Vali_plot(signal_type)
     legend('show', 'Location', 'best');
     hold off; grid on;
 
-    figure(); 
-    plot(Time, Vcmd_mean - Wgyro_mean,'b-', 'LineWidth',1.4);
-    xlabel('Time[sec]','FontWeight','bold');
-    ylabel('Error function normalized V_{cmd}[V] - \omega_{gyro}[rad/sec]','FontWeight','bold');
-    title("Error function normalized", 'FontWeight','bold');
-    grid on;
+    % figure(); 
+    % plot(Time, Vcmd_mean - Wgyro_mean,'b-', 'LineWidth',1.4);
+    % xlabel('Time[sec]','FontWeight','bold');
+    % ylabel('Error function V_{cmd}[V] - \omega_{gyro}[rad/sec]','FontWeight','bold');
+    % title("Error function normalized", 'FontWeight','bold');
+    % grid on;
 
  
 end

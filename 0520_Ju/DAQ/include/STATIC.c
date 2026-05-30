@@ -1,7 +1,5 @@
 #include "Header.h"
 
-
-
 static double      Vcmd = 0.0;
 
 char OutDirName[N_NAME_BUFFER] = { 0 };
@@ -16,9 +14,9 @@ void IterStaticProperty(int Static_mode) {
 
     for (idx = 0; idx < STATIC_ITER_MAX; idx++) {
         printf("\n==============================\n");
-        printf("\tIteration: %d", idx);
+        printf("\tIteration: %d", idx + 1);
         printf("\n==============================\n");
-        StaticProperty(Static_mode, idx);
+        StaticProperty(Static_mode, idx + 1);
     }
 
 }
@@ -48,7 +46,7 @@ void StaticProperty(int Static_mode, int Iter_num){
         Vc_pos = STATIC_POSITIVE_START_POINT;
         Vc_neg = STATIC_NEGATIVE_START_POINT;
 
-        strcpy(OutDirName, STATIC_DIR);
+        sprintf(OutDirName, "Static_iter%d.out", Iter_num);
 
         RUN_DAQ_mode = NON_LINEAR;
     }
@@ -62,8 +60,6 @@ void StaticProperty(int Static_mode, int Iter_num){
 
         RUN_DAQ_mode = LINEAR;
     }
-
-    //sprintf(OutDirName, "%s_iter%d.out", STATIC_DIR, Iter_num + 1);
 
     for (int mag = 0; mag < STATIC_N_SWEEP / 2; mag++) {
 
@@ -96,6 +92,7 @@ void StaticProperty(int Static_mode, int Iter_num){
 
             //printf("\nVcmd is %.2f\n", Vcmd);// -> nice work!
             //printf("idx_curr: %d\n", idx_curr); // -> nice work!
+            
             sprintf(OutFileName, "Static_Step_%.2f.out", Vcmd);
 
             RunDAQ(STATIC_TIME_FINAL, STATIC_DATA_DIR, OutFileName, Static_Step);

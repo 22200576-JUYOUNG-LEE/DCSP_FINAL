@@ -43,7 +43,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -132,6 +132,7 @@
     <ClCompile Include="include\DAQ.c" />
     <ClCompile Include="include\LIN.c" />
     <ClCompile Include="include\MODE.c" />
+    <ClCompile Include="include\POTEN.c" />
     <ClCompile Include="include\VALID.c" />
     <ClCompile Include="include\SAVE.c" />
     <ClCompile Include="include\STATIC.c" />

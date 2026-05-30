@@ -7,6 +7,8 @@ static const char* MODE_LABELS[N_MODE] = {
     "Linearized Mapping",
     "Motor Validation",
     "Bode Mag",
+    "Potentio",
+    "Format"
 };
 
 Mode SelectOperatingMode(void){
@@ -31,6 +33,8 @@ void RunMode(void)
         case MODE_STATIC_LINEAR: StaticProperty(LINEAR, LIN_ITER_MAX);             break;
         case MODE_VALIDATION:    StaticValidation();                 break;
         case MODE_BODE:          BodeMag();                          break;
+        case MODE_POTEN:         Potentio();                         break;
+        case MODE_FORMAT:        Format();                           break;
         
         default: printf("[ERROR] Unknown mode:\n");                  break;
     }
@@ -49,6 +53,7 @@ void RunDAQ(double Final_time, const char* OutDirName, const char* OutFileName, 
 
     int         idx_max = Final_time * SAMPLING_FREQ;
 
+    int         count = 0;
     int         count_avg = 0;
 
     double      time_curr = 0.0;    //[sec]
@@ -56,7 +61,7 @@ void RunDAQ(double Final_time, const char* OutDirName, const char* OutFileName, 
     double      time = 0.0;         //[sec]
 
     double      Vcmd = 0.0;         //[V]
-    double      Vc = 0.0;           //[V]
+    double      Vc = DAQ_V_STANDARD;//[V]
     double      Vgyro = 0.0;        //[V]
     double      Vpoten = 0.0;       //[V]
     double      Wgyro = 0.0;        //[rad/sec]  
@@ -78,24 +83,44 @@ void RunDAQ(double Final_time, const char* OutDirName, const char* OutFileName, 
     };
     int         numDataset = sizeof(Out_DAQ_Dataset) / sizeof(Out_DAQ_Dataset[0]);
 
+    double keyboard_input = 0.0;
+
     InitAvg();
 
     time_init = GetWindowTime();
     time_curr = time_init;
 
-    for (int count = 0; count < idx_max; count++) {
+    do 
+    {
         time = (time_curr - time_init) * 0.001;
+        Vc = DAQ_V_STANDARD;
 
-        s.Time = time;
-        s.Vcmd = Vcmd;
-        s.Wgyro = Wgyro;
-        s.Vpoten = Vpoten;
+        if (RUN_DAQ_mode == USER_INPUT) {
+            // @. Emergency Stop
+            if (_kbhit()) {
+                keyboard_input = _getch();
+                if (keyboard_input == 'r') // 'r' = CW
+                    Vc = DAQ_V_STANDARD + POTEN_EPS;
+                else if (keyboard_input == 'l') // 'l' = CCW
+                    Vc = DAQ_V_STANDARD - POTEN_EPS;
+                else if (keyboard_input == 's')
+                    break;
+            }
+        }
+        else {
+            s.Time = time;
+            s.Vcmd = Vcmd;
+            s.Wgyro = Wgyro;
+            s.Vpoten = Vpoten;
 
-        // 2. Processing
-        Vcmd = fn(s);
+            // 2. Processing
+            if (fn != NULL) Vcmd = fn(s);
 
-        if (RUN_DAQ_mode == LINEAR) Vc = Linearization(Vcmd);
-        else Vc = Vcmd;
+            if (RUN_DAQ_mode == LINEAR) Vc = Linearization(Vcmd);
+            else Vc = Vcmd;
+        }
+
+        
 
         // 3. Write and Read
         DAQ_Write(Vc);
@@ -109,7 +134,7 @@ void RunDAQ(double Final_time, const char* OutDirName, const char* OutFileName, 
         Out_Time[count] = time;
         Out_Vcmd[count] = Vcmd;
         Out_Vgyro[count] = Vin[2];
-        Out_Theta[count] = Vpoten * (SCALE_REV2DEG) / V_POTEN;
+        Out_Theta[count] = VOLT2DEG(Vpoten);
         Out_Wgyro[count] = Wgyro * SCALE_RAD2DEG;
 
         if (count >= idx_max / 2) {
@@ -120,13 +145,14 @@ void RunDAQ(double Final_time, const char* OutDirName, const char* OutFileName, 
             g_daqAvg.Angle = CAL_AVG(count_avg, g_daqAvg.Angle, Out_Theta[count]);
             g_daqAvg.Wgyro = CAL_AVG(count_avg, g_daqAvg.Wgyro, Out_Wgyro[count]);
         }
-
-        // @. Emergency Stop
-        if (_kbhit())
-            if (_getch() == 's') {
+        
+        if (_kbhit()) {
+            if (_getch() == 'o') {
                 DAQ_Close();
                 exit(0);
             }
+        }
+
         // @. Wite for endging a tick
         while (1)
         {
@@ -134,7 +160,8 @@ void RunDAQ(double Final_time, const char* OutDirName, const char* OutFileName, 
             if (time_curr - time_init - count * SAMPLING_TIME * 1000.0
                 >= (SAMPLING_TIME * 1000.0)) break;
         }
-    }
+        count++;
+    }while (count < idx_max);
 
     SaveDataset(OutDirName, OutFileName, Out_DAQ_Dataset, numDataset, idx_max);
 }
