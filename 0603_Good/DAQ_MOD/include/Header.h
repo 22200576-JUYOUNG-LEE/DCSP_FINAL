@@ -1,0 +1,206 @@
+#ifndef		_MY_DAQ_H	
+#define		_MY_DAQ_H
+
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <windows.h>
+#include <time.h>
+#include <conio.h>
+#include <direct.h>
+#include "NIDAQmx.h"
+
+#define   N_STEP          (int)   ( FINAL_TIME*SAMPLING_FREQ )
+#define   FINAL_TIME      (double)(            4 )  // [Sec]
+#define   SAMPLING_FREQ   (double)(            200 ) // [Hz]
+#define   SETTLING_TIME   (double)( FINAL_TIME*0.5  ) // [2.5 sec]
+#define   SAMPLING_TIME   (double)( 1.0/SAMPLING_FREQ )
+#define   UNIT_PI         (double)( 3.14159265358979  )
+
+#define   N_NAME_BUFFER   (int)   (               256)
+
+#define   SCALE_RAD2DEG   (double) (180.0 / UNIT_PI)
+#define   SCALE_REV2DEG   (double) (360.0)
+
+#define   GYRO_V2RADS     (double) (1000.0 * UNIT_PI) / (0.67 * 180.0)
+
+#define   DEVICE_NUM      (int)    (                6)
+#define   NUM_A0_CHANNELS (int)    (                2)
+#define   NUM_AI_CHANNELS (int)    (                4) 
+
+#define   N_MAX_BUFFER    (int)    (            100000)
+
+#define   DAQ_V_STOP       (double) (              0.0)
+#define   DAQ_V_START      (double) (              5.0)
+#define   DAQ_V_STANDARD   (double) (              2.5)
+
+#define   V_POTEN         (double) (              5.0)
+
+
+#define CAL_AVG(num_data, Ybar_pre, Y) \
+    (((1.0 - 1.0 / (num_data)) * (Ybar_pre)) + ((1.0 / (num_data)) * (Y)))
+#define VOLT2DEG(Vpoten) \
+    (Vpoten * (SCALE_REV2DEG) / V_POTEN - 180.0)
+
+
+// RUNNING DEFINE
+#define   NON_LINEAR            (int) (0)
+#define   LINEAR                (int) (1)
+#define   USER_INPUT            (int) (2)
+
+#define   OFFSET_TIME           (double) (              5.0)
+#define   OFFSET_DIR            (const char*)(     "Offset")
+#define   OFFSET_FILE           (const char*)( "Offset.out")
+      
+#define   STATIC_ITER_MAX       (int)(5)
+#define   STATIC_NEGATIVE_START_POINT   (double)(2.3)
+#define   STATIC_POSITIVE_START_POINT   (double)(2.7)
+#define   STATIC_CLOSE_NEGATIVE_POINT   (double)(2.2)
+#define   STATIC_CLOSE_POSITIVE_POINT   (double)(2.8)
+#define   STATIC_WIDE_STEP      (double)(0.02)
+#define   STATIC_CLOSE_STEP     (double)(0.02)
+#define   STATIC_N_SWEEP        (int)       ( 80)
+#define   STATIC_TIME_PAUSE     (double)    (1.0)
+#define   STATIC_TIME_DELAY     (double)    (0.5)
+#define   STATIC_TIME_FINAL     (double)    (4.0)
+#define   STATIC_DIR            (const char*)(     "Static")   
+#define   STATIC_DIR_LIN        (const char*)("Static_Linear")   
+#define   STATIC_FILE           (const char*)( "Static.out")
+#define   STATIC_DATA_DIR       (const char*)("Static_data")   
+#define   STATIC_SIGN_POSITIVE  (int)(               0)
+#define   STATIC_SIGN_NEGATIVE  (int)(               1)
+
+#define   LIN_V_DEADZONE        (double) (0.02)
+#define   LIN_ITER_MAX          (int) (1)
+
+#define   VALID_DIR             (const char*)("Validation")
+#define   VALID_ITER_MAX        (int) (3)
+
+#define   VALID_TRI_TIME_PAUSE  (double) (2.0)
+#define   VALID_TRI_TIME_PERIOD (double)(30.0)
+#define   VALID_TRI_SLOPE       (double)(0.7 / VALID_TRI_TIME_PERIOD)
+#define   VALID_TRI_TIME_POINT1 (double)(              1.0)
+#define   VALID_TRI_TIME_POINT2 (double)(VALID_TRI_TIME_POINT1+VALID_TRI_TIME_PERIOD)
+#define   VALID_TRI_TIME_POINT3 (double)(VALID_TRI_TIME_POINT2+ 2.0* VALID_TRI_TIME_PERIOD)
+#define   VALID_TRI_TIME_POINT4 (double)(VALID_TRI_TIME_POINT3+ 2.0* VALID_TRI_TIME_PERIOD)
+#define   VALID_TRI_TIME_POINT5 (double)(VALID_TRI_TIME_POINT4+ 2.0* VALID_TRI_TIME_PERIOD)
+#define   VALID_TRI_TIME_FINAL  (double)(VALID_TRI_TIME_POINT5 + VALID_TRI_TIME_PERIOD + 1)
+
+#define   VALID_SIN_TIME_PAUSE  (double)(1.0)
+#define   VALID_SIN_AMPLITUDE   (double)(0.7)
+#define   VALID_SIN_TIME_FINAL  (double)(VALID_SIN_TIME_2 +1)
+#define   VALID_SIN_TIME_1      (double)(1.0)
+#define   VALID_SIN_FREQ        (double)(0.01)
+#define   VALID_SIN_TIME_2      (double)(VALID_SIN_TIME_1+ 3 / VALID_SIN_FREQ)
+
+#define   BODE_ITER_MAX         (int) (15)
+#define   BODE_DIR              (const char*)("BodeMag")
+#define   BODE_TIME_PAUSE       (double)(2.0)
+#define   BODE_ITER_START       (int) (0)
+
+#define   BODE_SIN_FREQ_STEP    (double)(0.1)
+#define   BODE_SIN_TIME_FINAL   (double)(10)
+#define   BODE_SIN_AMPLITUDE    (double)(0.7)
+
+#define   POTEN_FINAL_TIME      (double)(8.0)
+#define   POTEN_FILE            (const char*)("Poten.out")
+#define   POTEN_DATA_DIR        (const char*)("Poten_data") 
+#define   POTEN_EPS             (double)(1.0)
+
+
+typedef enum {
+    MODE_STATIC         = 1,
+    MODE_STATIC_LINEAR  = 2,
+    MODE_VALIDATION     = 3, 
+    MODE_BODE           = 4,
+    MODE_POTEN          = 5,
+    MODE_FORMAT         = 6,
+    MODE_DESIGNATION    = 7,
+
+
+
+    N_MODE              = 7,
+} Mode;
+
+extern TaskHandle   taskAI;
+extern TaskHandle   taskAO;
+
+extern int          RUN_DAQ_mode;
+
+extern double       Vgyro_offset;
+
+extern char         OutDirName[N_NAME_BUFFER];
+extern char         OutFileName[N_NAME_BUFFER];
+
+typedef struct {
+    const char* name;
+    const double* data;
+} Dataset;
+
+typedef struct {
+    double Time;
+    double Vcmd;
+    double Wgyro;
+    double Vpoten;
+} DynState;
+
+typedef double (*DynFn)(DynState s);
+
+typedef struct {
+    double Vcmd;
+    double Vgyro;
+    double Wgyro;
+    double Angle;
+} DAQ_Averages;
+
+extern DAQ_Averages g_daqAvg;
+
+
+// 1. myWin.c
+double GetWindowTime(void);
+void SaveDataset(const char* DirName, const char* OutFileName, const Dataset* Out_Dataset, const int num_col, const int num_row);
+
+// myMode.c
+Mode SelectOperatingMode(void);
+void RunMode(void);
+void RunDAQ(double Final_time, const char* OutDirName, const char* OutFileName, DynFn fn);
+void InitAvg(void);
+
+// 2. myDAQ.c
+void DAQ_Init();
+void DAQ_Reset(); 
+void DAQ_Write(double Vcmd);
+void DAQ_Read(double* Vin);
+void DAQ_Pause(double time_delay);
+void DAQ_Close();
+
+
+// 4. myMotor.c
+void IterStaticProperty(int Static_mode);
+void StaticProperty(int Static_mode, int Iter_num);
+void InitPath(void);
+
+
+// 5. myValidation.c
+void StaticValidation();
+double Valid_triangle(DynState s);
+double Valid_sin(DynState s);
+double Linearization(double vin);
+void ReadLinearCoefficent(void);
+
+// 6. myBode.c
+void BodeMag();
+
+//7. Potien.c
+void Potentio();
+void Format();
+double FORMAT_func(DynState s);
+
+//8. Designaiton.c
+void Designation(void);
+double Designation_Control(DynState s);
+
+
+#endif

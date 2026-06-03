@@ -1,0 +1,81 @@
+%% DC_PROJECT
+% 2. PLOT Wgyro & Bode Magnitude Plot
+function plot_BodeMag(base_dir)
+    
+    % 분석할 주파수 범위 설정
+    freq_range = 0 : 0.8 : 1.6; % 필요 시 0:0.2:... 등으로 수정
+    
+    % 보데 플롯을 그리기 위해 주파수와 크기를 저장할 배열 초기화
+    Valid_Freqs = [];
+    Magnitudes = [];
+    
+    % --- 1. 시영역 응답 플롯 (기존 코드) ---
+    figure('Name', 'Time Domain Responses'); hold on; grid on;
+    
+    for idx = freq_range
+    
+        % 1. 동적 파일 이름 생성
+        filename = sprintf('../data/%s/BodeMag_sin_freq%.2f.out', base_dir, idx);
+        
+        % [수정] 레전드 단위를 V에서 Hz로 변경 (주파수이므로)
+        colName = sprintf('Freq = %.1f Hz', idx);
+    
+        if isfile(filename)
+            % 2. 데이터 로드
+            Dataset = readmatrix(filename, 'NumHeaderLines', 1, 'FileType', 'text');
+            Time = Dataset(:,1);
+            Wgyro = Dataset(:,5);
+            
+            % 노이즈 제거 (이동 평균)
+            window_size = 10;
+            Wgyro = movmean(Wgyro, window_size, 1);
+            
+            % 3. 시영역 플롯
+            plot(Time, Wgyro, 'LineWidth', 1.2, 'DisplayName', colName);
+            
+            % --- [추가] 보데 플롯을 위한 최대 크기 추출 ---
+            % 이전 C 코드 기준, 신호가 인가되는 1초 ~ 5초 사이의 유효 데이터만 추출
+            active_idx = find(Time >= 1.0 & Time <= 5.0);
+            if ~isempty(active_idx)
+                active_Wgyro = Wgyro(active_idx);
+                
+                % 단순히 max()를 쓰면 오프셋(Offset)에 의해 오차가 생길 수 있으므로,
+                % (최대값 - 최소값) / 2 를 하여 순수한 사인파의 진폭(Amplitude)을 구함
+                amp_out = (max(active_Wgyro) - min(active_Wgyro)) / 2;
+                
+                Valid_Freqs(end+1) = idx;
+                Magnitudes(end+1) = amp_out;
+            end
+        else
+            fprintf('[안내] 파일을 찾을 수 없습니다: %s\n', filename);
+        end
+        
+    end
+    
+    % 시영역 그래프 꾸미기
+    xlabel('Time [sec]', 'FontWeight', 'bold');
+    ylabel('\omega_{gyro} [rad/sec]', 'FontWeight', 'bold');
+    title('Time Domain Sine Responses', 'FontSize', 12);
+    legend('show', 'Location', 'best');
+    hold off;
+    
+    % --- 2. 보데 크기 선도 (Bode Magnitude Plot) 생성 ---
+    if ~isempty(Valid_Freqs)
+        figure('Name', 'Bode Magnitude Plot'); hold on; grid on;
+        
+        % 주파수에 따른 출력 진폭 플롯 (현재는 0, 0.8, 1.6 등 선형 간격이므로 일반 plot 사용)
+        plot(Valid_Freqs, Magnitudes, 'ro-', 'LineWidth', 1.5, 'MarkerFaceColor', 'r');
+        
+        xlabel('Frequency [Hz]', 'FontSize', 12, 'FontWeight', 'bold');
+        ylabel('Magnitude (Max \omega_{gyro}) [rad/sec]', 'FontSize', 12, 'FontWeight', 'bold');
+        title('Bode Magnitude Plot', 'FontSize', 14);
+        
+        % [참고] 만약 입력 전압(A) 대비 데시벨(dB) 스케일로 나타내고 싶다면 아래 코드를 사용한다.
+        % input_amplitude = 1.8; % C코드에서 설정했던 입력 진폭
+        % mag_dB = 20 * log10(Magnitudes / input_amplitude);
+        % plot(Valid_Freqs, mag_dB, 'ro-', 'LineWidth', 1.5);
+        % ylabel('Magnitude [dB]');
+        
+        hold off;
+    end
+end
