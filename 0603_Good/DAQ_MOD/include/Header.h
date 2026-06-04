@@ -104,7 +104,7 @@
 #define   BODE_SIN_TIME_FINAL   (double)(10)
 #define   BODE_SIN_AMPLITUDE    (double)(0.7)
 
-#define   POTEN_FINAL_TIME      (double)(8.0)
+#define   POTEN_FINAL_TIME      (double)(3.0)
 #define   POTEN_FILE            (const char*)("Poten.out")
 #define   POTEN_DATA_DIR        (const char*)("Poten_data") 
 #define   POTEN_EPS             (double)(1.0)
@@ -199,7 +199,7 @@ void Format();
 double FORMAT_func(DynState s);
 
 //8. Designaiton.c
-void Designation(void);
+void   Designation(void);
 double Designation_Control(DynState s);
 
 

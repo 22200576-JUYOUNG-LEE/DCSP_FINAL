@@ -14,4 +14,52 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="include\DAQ.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\LIN.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\MODE.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\POTEN.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Potentio.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\SAVE.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\STATIC.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\VALID.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="system.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\DESIGNATION.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\BODE.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Header.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NIDAQmx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\NIDAQmx.lib">
+      <Filter>리소스 파일</Filter>
+    </Library>
+  </ItemGroup>
 </Project>

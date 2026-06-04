@@ -30,18 +30,19 @@ void RunMode(void)
 {
 
     switch (SelectOperatingMode()) {
-        case MODE_STATIC:        IterStaticProperty(NON_LINEAR);         break;
-        case MODE_STATIC_LINEAR: StaticProperty(LINEAR, LIN_ITER_MAX);             break;
-        case MODE_VALIDATION:    StaticValidation();                 break;
-        case MODE_BODE:          BodeMag();                          break;
-        case MODE_POTEN:         Potentio();                         break;
-        case MODE_FORMAT:        Format();                           break;
-        case MODE_DESIGNATION:   Designation();                      break;
+    case MODE_STATIC:        IterStaticProperty(NON_LINEAR);         break;
+    case MODE_STATIC_LINEAR: StaticProperty(LINEAR, LIN_ITER_MAX);             break;
+    case MODE_VALIDATION:    StaticValidation();                 break;
+    case MODE_BODE:          BodeMag();                          break;
+    case MODE_POTEN:         Potentio();                         break;
+    case MODE_FORMAT:        Format();                           break;
+    case MODE_DESIGNATION:   Designation();                      break;
 
 
 
-        default: printf("[ERROR] Unknown mode:\n");                  break;
+    default: printf("[ERROR] Unknown mode:\n");                  break;
     }
+    
 }
 
 void InitAvg(void) {

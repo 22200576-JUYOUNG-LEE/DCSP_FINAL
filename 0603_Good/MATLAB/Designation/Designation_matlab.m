@@ -1,88 +1,64 @@
 % subject: Digital control
-
 % title: Designation Loop
-
 % author: Jihoon Park
-
 clc;
-
 clear all;
-
 close all;
 
+filename = '..\..\Data\Designation_data\Designation_Step_30.out'; 
+data = readmatrix(filename, 'FileType', 'text', 'NumHeaderLines', 1);
 
 %% Motor parameters
-
 Pm = 10.42;
-
 Km = 1301;
 
-
-
 %% Pole placement - tune these two
-
-Wn   = 35;
-
-zeta = 0.7;
-
-
+Wn   = 38;
+zeta = 1/sqrt(2);
 
 %% Controller gains (auto-calculated)
-
 Kp = Wn^2 / (Km * Pm);
-
 Kd = (2*zeta*Wn - Pm) / (Km * Pm);
 
-
-
 fprintf('Kp = %.6f\n', Kp);
-
 fprintf('Kd = %.6f\n', Kd);
-
 fprintf('Kp/Kd (-K- block) = %.4f\n', Kp/Kd);
 
-
-
 %% Step input for simin
-
-Tf   = 5;
-
+Tf   = 2;
 Ts   = 0.005;
-
 time = (0:Ts:Tf)';
+input_val=30.0;
+data_time = data(:,1);
+data_theta   = data(:, 4); % Actual Angle [deg] 
 
-input_val=80.0;
-
-simin = [time, input_val*ones(size(time))];   % 1 deg step
-
-
+simin_theta = [data_time data_theta];
+simin_step = [time, input_val*ones(size(time))];   % 1 deg step
 
 %% Run Simulink
-
 out = sim("Designation.slx");
 
-
-
-
-%% Plot (기존 코드 유지)
-t   = out.tout;
-psi = out.simout.Data;
+%% Plot
+t   = out.simout_time;
+sim_psi = out.simout_Angle;
+real_psi = out.simout_real_Angle;
 
 data_size = length(t);
 ninety_percent = zeros(size(t));
 for i = 1:1:data_size
-    ninety_percent(i) = psi(end) * 0.9;
+    ninety_percent(i) = sim_psi(end) * 0.9;
 end
 
 figure(1), clf;
 hold on;
 plot(t, ones(size(t)),     'Color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5, 'LineStyle', '--');
-plot(t, psi,               'Color', [0.0000 0.4470 0.7410], 'LineWidth', 2.0);
+plot(t, sim_psi,               'Color', [0.0000 0.4470 0.7410], 'LineWidth', 2.0);
+plot(t, real_psi,           'Color', [0.8500 0.0000 0.0980], 'LineWidth', 2.0);
 plot(t, ninety_percent,    ':', 'Color', [0.4660 0.6740 0.1880], 'LineWidth', 1.5);
 grid on, box on;
 xlabel('time [sec]');
 ylabel('response [deg]');
-legend('\psi_{gc}', '\psi_g', '90%', 'Location', 'best');
+legend('\psi_{gc}', '\psi_g', '\psi_{actual}', '90%', 'Location', 'best');
 title(sprintf('Designation Loop  (W_n=%d rad/s,  \\zeta=%.1f)', Wn, zeta));
 
 %% ==========================================
@@ -98,10 +74,18 @@ G_plant = Km / (s * (s + Pm));
 G_controller = Kp + Kd * s;
 
 % 3) 개루프 전달함수 (Open-loop Transfer Function: L(s))
-L = G_controller * G_plant;
+Go = G_controller * G_plant;
+Gcl = Go / (1+ Go);
+
+Gcl_min = minreal(Gcl);
+
+figure();
+nyquist(Go);
+figure();
+pzmap(Gcl_min);
 
 % 4) 이득 여유(GM) 및 위상 여유(PM) 추출
-[Gm, Pm_val, Wcg, Wcp] = margin(L);
+[Gm, Pm_val, Wcg, Wcp] = margin(Go);
 Gm_dB = 20*log10(Gm); % dB 단위 변환
 
 %% ==========================================
@@ -110,8 +94,8 @@ Gm_dB = 20*log10(Gm); % dB 단위 변환
 input_val = 80.0; 
 
 % 시간 영역 계산
-target_90 = psi(end) * 0.9;
-idx_tr = find(psi >= target_90, 1, 'first');
+target_90 = sim_psi(end) * 0.9;
+idx_tr = find(sim_psi >= target_90, 1, 'first');
 
 if ~isempty(idx_tr)
     tr_90 = t(idx_tr); 
@@ -119,10 +103,10 @@ else
     tr_90 = Inf; 
 end
 
-max_response = max(psi);
-overshoot_pct = ((max_response - psi(end)) / psi(end)) * 100;
+max_response = max(sim_psi);
+overshoot_pct = ((max_response - sim_psi(end)) / sim_psi(end)) * 100;
 if overshoot_pct < 0, overshoot_pct = 0; end
-ess = abs(input_val - psi(end));
+ess = abs(input_val - sim_psi(end));
 
 % 스펙 한계치 설정 (슬라이드 기준)
 spec_tr_limit   = 0.1;   % sec
@@ -166,17 +150,17 @@ else
 end
 fprintf('================================================\n');
 
-%% 그래프 상에 텍스트 표시
-text_x = Tf * 0.4;
-if final_pass
-    text(text_x, 0.4, 'TOTAL SPEC: PASS', 'Color', [0 0.5 0], 'FontSize', 12, 'FontWeight', 'bold', 'EdgeColor', [0 0.5 0]);
-else
-    text(text_x, 0.4, 'TOTAL SPEC: FAIL', 'Color', [1 0 0], 'FontSize', 12, 'FontWeight', 'bold', 'EdgeColor', [1 0 0]);
-end
+% %% 그래프 상에 텍스트 표시
+% text_x = Tf * 0.4;
+% if final_pass
+%     text(text_x, 0.4, 'TOTAL SPEC: PASS', 'Color', [0 0.5 0], 'FontSize', 12, 'FontWeight', 'bold', 'EdgeColor', [0 0.5 0]);
+% else
+%     text(text_x, 0.4, 'TOTAL SPEC: FAIL', 'Color', [1 0 0], 'FontSize', 12, 'FontWeight', 'bold', 'EdgeColor', [1 0 0]);
+% end
 
 %% 주파수 응답 확인용 마진 보드선도 추가 가동 (선택 사항)
 figure('Name', 'Open-Loop Margin Plot');
-margin(L);
+margin(Go);
 
 %% 관련 헬퍼 함수
 function str = getStatusStr(pass_flag)
