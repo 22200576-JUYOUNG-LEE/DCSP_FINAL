@@ -8,7 +8,7 @@ function [X_mean, Y_mean]=plot_iter(filename, X, Y, itr)
             % 2. Get Dataset
             Dataset = readmatrix(current_file, 'NumHeaderLines', 1, 'FileType', 'text');
             Vc(:,idx) = Dataset(:,X);
-            Wgyro(:,idx) = Dataset(:,Y);
+            Wgyro(:,idx) = Dataset(:,Y) .* 0.017453;
         else
 
             fprintf('Cannot find a file: %s\n', current_file);  

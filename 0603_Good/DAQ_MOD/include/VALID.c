@@ -1,10 +1,16 @@
 #include "Header.h"
 
+#define VALID_SIN_FUNC(time) \
+    (VALID_SIN_AMPLITUDE * sin(2.0 * UNIT_PI * VALID_SIN_FREQ * ((time) - VALID_SIN_TIME_1)))
+
+double Valid_triangle(DynState s);
+double Valid_sin(DynState s);
+
 void StaticValidation() {
 
     InitPath();
 
-    RUN_DAQ_mode = LINEAR;
+    RUN_DAQ_mode = RUN_MODE_LINEAR;
 
     printf("[Motor Validation] ...\n");
     for (int iter = 0; iter < VALID_ITER_MAX; iter++) {
@@ -41,6 +47,6 @@ double Valid_triangle(DynState s)
 double Valid_sin(DynState s)
 {
     if (s.Time < VALID_SIN_TIME_1)          return 0.0;
-    else if (s.Time < VALID_SIN_TIME_2)     return VALID_SIN_AMPLITUDE * sin(2.0 * UNIT_PI * VALID_SIN_FREQ* (s.Time - VALID_SIN_TIME_1));
+    else if (s.Time < VALID_SIN_TIME_2)     return VALID_SIN_FUNC(s.Time);
     else                    return 0.0;
 }

@@ -31,11 +31,11 @@ void DAQ_Init() {
     DAQmxStartTask(taskAI);
     DAQmxStartTask(taskAO);
 
-    RUN_DAQ_mode = NON_LINEAR;
+    RUN_DAQ_mode = RUN_MODE_NONLINEAR;
 
     RunDAQ(OFFSET_TIME, OFFSET_DIR, OFFSET_FILE, Offset_Zero);
 
-    Vgyro_offset = g_daqAvg.Vgyro;
+    Vgyro_offset = Data_avg.Vgyro;
     printf("\nVgyro_offset is %.4f\n", Vgyro_offset);
 
     ReadLinearCoefficent();

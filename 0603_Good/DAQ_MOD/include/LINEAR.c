@@ -1,5 +1,4 @@
 #include "Header.h"
-#define MAX_RATE 1400.0/1300.0 // [deg/sec]
 
 double OperPoint_Vc = 0.0, OperPoint_Wgyro = 0.0;
 double a1 = 0.0, a2 = 0.0;
@@ -15,26 +14,22 @@ double c_deadZone = 0.0;
 double d_deadZone = 0.0; 
 
 
-#define CLOSE_DEADZONE 0.02
-
-
-
 double Linearization(double vin) {
     double Vc = 0.0;
-    double w_input = vin;
+    double Vcmd = vin;
 
     // 1. Saturation implementation 
-    if (w_input > MAX_RATE) w_input = MAX_RATE;
-    else if (w_input < -MAX_RATE) w_input = -MAX_RATE;
+    if (Vcmd > LIN_MAX_RATE) Vcmd = LIN_MAX_RATE;
+    else if (Vcmd < -LIN_MAX_RATE) Vcmd = -LIN_MAX_RATE;
 
     // 2. No need of LIN_V_DZ
-    if (w_input >= LIN_V_DEADZONE) {
+    if (Vcmd >= LIN_V_DEADZONE) {
         // 4th order: CW 
-        Vc = a1 * pow(w_input, 4) + b1 * pow(w_input, 3) + c1 * pow(w_input, 2) + d1 * w_input + e1;
+        Vc = a1 * pow(Vcmd, 4) + b1 * pow(Vcmd, 3) + c1 * pow(Vcmd, 2) + d1 * Vcmd + e1;
     }
-    else if (w_input <= -LIN_V_DEADZONE) {
+    else if (Vcmd <= -LIN_V_DEADZONE) {
         // 4th order: CCW
-        Vc = a2 * pow(w_input, 4) + b2 * pow(w_input, 3) + c2 * pow(w_input, 2) + d2 * w_input + e2;
+        Vc = a2 * pow(Vcmd, 4) + b2 * pow(Vcmd, 3) + c2 * pow(Vcmd, 2) + d2 * Vcmd + e2;
     }
     else {
         Vc = DAQ_V_STANDARD;
@@ -44,7 +39,7 @@ double Linearization(double vin) {
 }
 
 void ReadLinearCoefficent(void) {
-    FILE* fp = fopen("../data/LIN_COEF.csv", "r");
+    FILE* fp = fopen("../data/LINEAR_COEF.csv", "r");
     char buffer[256];
 
     if (fp == NULL) {

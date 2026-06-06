@@ -22,10 +22,10 @@
     <ClCompile Include="include\BODE.c" />
     <ClCompile Include="include\DAQ.c" />
     <ClCompile Include="include\DESIGNATION.c" />
-    <ClCompile Include="include\LIN.c" />
+    <ClCompile Include="include\LINEAR.c" />
     <ClCompile Include="include\MODE.c" />
-    <ClCompile Include="include\POTEN.c" />
-    <ClCompile Include="include\Potentio.c" />
+    <ClCompile Include="include\FORMAT.c" />
+    <ClCompile Include="include\RUN_DAQ.c" />
     <ClCompile Include="include\SAVE.c" />
     <ClCompile Include="include\STATIC.c" />
     <ClCompile Include="include\VALID.c" />

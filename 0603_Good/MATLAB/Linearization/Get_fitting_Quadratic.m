@@ -2,15 +2,15 @@ function [coeff_pos, coeff_neg, coeff_dz, V_pos_start, V_neg_start] = Get_fittin
     % =========================================================
     % SYSTEM PARA
     % =========================================================
-    Linslope  = 1300;     % 변환 상수 K
+    Linslope  = 21.365;     % 변환 상수 K
     order     = 4;        % 정/역방향 4차 고정
     dz_order  = 1;        % 데드존 3차 고정
 
     % 오리지널 속도 경계값 [deg/s]
-    pos_start = 10.26; %<--    
-    pos_end   = 1138;   
-    neg_start = -23.37; 
-    neg_end   = -1128; 
+    pos_start = 0.3325; %<--    
+    pos_end   = 19.8222;   
+    neg_start = -0.5112; 
+    neg_end   = -19.7323; 
 
     % 입력 제어 명령(vin) 기준의 경계값으로 변환
     V_pos_start = pos_start / Linslope;
@@ -49,7 +49,7 @@ function [coeff_pos, coeff_neg, coeff_dz, V_pos_start, V_neg_start] = Get_fittin
     header_row = nan(1, length(coeff_pos));
     header_row(1:2) = [OperPoint_Vcmd, OperPoint_Vc];
     data_matrix = [header_row; coeff_pos; coeff_neg; coeff_dz_data];
-    writematrix(data_matrix, '..\data\LIN_COEF.csv'); 
+    writematrix(data_matrix, '..\data\LINEAR_COEF.csv'); 
 
     % =========================================================
     % 시각화 (Plot)

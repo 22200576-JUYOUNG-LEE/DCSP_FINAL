@@ -1,9 +1,9 @@
 %% DC_PROJECT
 % 3. Validation PLOT Wqyro
-function plot_bode(base_dir)
+function BODE_plot(base_dir)
     Time = [];
     
-    for idx = 0.2 :0.2: 2
+    for idx = 0.2 :0.2: 1.0
         % 1. 동적 파일 이름 및 레전드 이름 생성
         filename = sprintf('%sBodeMag_sin_freq%.2f.out', base_dir, idx);
     
@@ -16,20 +16,13 @@ function plot_bode(base_dir)
             end
 
             Vcmd = Dataset(:,2);
-            Wgyro = Dataset(:,5);
+            Wgyro = Dataset(:,4);
 
-            Vcmd = normalize(Vcmd, 'range', [-910 910]);
+            Vcmd = normalize(Vcmd, 'range', [-21.365*0.7 21.365*0.7]);
 
-
-            % % 3-1. MA
-            % window_size = 10;
-            % Vcmd = movmean(Vcmd, window_size, 1);  
-            % Wgyro = movmean(Wgyro, window_size, 1);
-
-             figure(); hold on;
-             plot(Time, Vcmd, 'b-', 'LineWidth', 1.5, 'DisplayName', 'V_{cmd\_mean}');
-
-             plot(Time, Wgyro, 'r-', 'LineWidth', 1.5, 'DisplayName', '\omega_{gyro\_mean}');
+            figure(); hold on;
+            plot(Time, Vcmd, 'b-', 'LineWidth', 1.5, 'DisplayName', 'V_{cmd\_mean}');
+            plot(Time, Wgyro, 'r-', 'LineWidth', 1.5, 'DisplayName', '\omega_{gyro\_mean}');
 
 
             %4. Labling

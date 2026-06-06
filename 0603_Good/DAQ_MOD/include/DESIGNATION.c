@@ -5,13 +5,12 @@ void Designation(void) {
     printf("\tDESIGNATION LOOP (PD Control + LIN)");
     printf("\n================================\n");
 
-    Format();
-    DAQ_Pause(1.0);
+    Format(FORMAT_ANGLE_ZERO);
+    DAQ_Pause(DESIGNATION_TIME_PAUSE);
     
-    RUN_DAQ_mode = LINEAR;
+    RUN_DAQ_mode = RUN_MODE_LINEAR;
 
-    // 5sec 
-    RunDAQ(1.0, "Designation_data", "Designation_Step.out", Designation_Control);
+    RunDAQ(DESIGNATION_TIME_FINAL, "Designation_data", "Designation_Step.out", Designation_Control);
 }
 
 double Designation_Control(DynState s) {
@@ -22,8 +21,8 @@ double Designation_Control(DynState s) {
     double target_deg = 80.0;
 
     // 2. sensor data [deg], [deg/s]
-    double current_deg = VOLT2DEG(s.Vpoten);
-    double current_rate_deg = s.Wgyro * SCALE_RAD2DEG;
+    double current_deg = V_POTEN2RAD(s.Vpoten);
+    double current_rate_deg = s.Wgyro;
 
     // 3. error calculation ()
     double error = target_deg - current_deg;
@@ -32,10 +31,6 @@ double Designation_Control(DynState s) {
     // 4. 
     double control_effort = (Kp * error) + (Kd * d_error);
 
-    //// 5. Saturation  
-    //double max_velocity = 1400.0 / 1300.0;
-    //if (control_effort > max_velocity) control_effort = max_velocity;
-    //if (control_effort < -max_velocity) control_effort = -max_velocity;
 
     // Vcmd return 
     return control_effort;

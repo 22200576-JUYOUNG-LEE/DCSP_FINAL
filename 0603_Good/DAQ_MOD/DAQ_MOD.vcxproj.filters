@@ -18,16 +18,7 @@
     <ClCompile Include="include\DAQ.c">
       <Filter>헤더 파일</Filter>
     </ClCompile>
-    <ClCompile Include="include\LIN.c">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
     <ClCompile Include="include\MODE.c">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="include\POTEN.c">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="include\Potentio.c">
       <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="include\SAVE.c">
@@ -46,6 +37,15 @@
       <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="include\BODE.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\RUN_DAQ.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\LINEAR.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\FORMAT.c">
       <Filter>헤더 파일</Filter>
     </ClCompile>
   </ItemGroup>
