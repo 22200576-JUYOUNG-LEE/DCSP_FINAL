@@ -1,5 +1,5 @@
 % subject: Digital control and signal Processing
-% title: Linearization
+% title: Stabilization
 
 clc;
 clear all;
