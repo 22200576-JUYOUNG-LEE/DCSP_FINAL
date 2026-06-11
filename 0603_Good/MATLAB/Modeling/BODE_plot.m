@@ -12,11 +12,11 @@ function BODE_plot(base_dir)
             Dataset = readmatrix(filename, 'NumHeaderLines', 1, 'FileType', 'text');
 
             if isempty(Time)
-                Time = Dataset(:,1); % 첫 유효 데이터에서 시간축 획득
+                Time = Dataset(1000:end,1); % 첫 유효 데이터에서 시간축 획득
             end
 
-            Vcmd = Dataset(:,2);
-            Wgyro = Dataset(:,4);
+            Vcmd = Dataset(1000:end,2);
+            Wgyro = Dataset(1000:end,4);
 
             Vcmd = normalize(Vcmd, 'range', [-21.365*0.7 21.365*0.7]);
 

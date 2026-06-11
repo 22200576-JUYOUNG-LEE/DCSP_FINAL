@@ -42,6 +42,10 @@ out = sim("Designation.slx");
 t   = out.simout_time;
 sim_psi = out.simout_Angle;
 real_psi = out.simout_real_Angle;
+rate_motor = out.simout_Motor_rate;
+
+fft_rate = fft(rate_motor);
+
 
 data_size = length(t);
 ninety_percent = zeros(size(t));

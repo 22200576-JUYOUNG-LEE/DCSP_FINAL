@@ -1,6 +1,6 @@
 function [freqs, gains, phases] = generate_bode_plot(data_dir)
     % Define frequency range as per your files
-    search_freqs = 0:0.1:1.5; 
+    search_freqs = 0.1:0.02:5.0; 
     
     valid_freqs = [];
     gains_raw = [];
@@ -37,20 +37,20 @@ function [freqs, gains, phases] = generate_bode_plot(data_dir)
             phase_deg = [phase_deg; mod(ph + 180, 360) - 180];
         end
     end
-    
+  
     freqs = valid_freqs;
     gains = gains_raw;
     phases = phase_deg;
+ 
+    figure(1);
+    plot(freqs, gains);
+    ylabel("gains");
+    xlabel("freqs");
+    title("Bode Mag");
 
-    % figure(1);
-    % plot(freqs, gains);
-    % ylabel("gains");
-    % xlabel("freqs");
-    % title("Bode Mag");
-    % 
-    % figure(2);
-    % plot(freqs, phases);
-    % ylabel("phase");
-    % xlabel("freqs");
-    % title("Bode phase");
+    figure(2);
+    plot(freqs, phases);
+    ylabel("phase");
+    xlabel("freqs");
+    title("Bode phase");
 end

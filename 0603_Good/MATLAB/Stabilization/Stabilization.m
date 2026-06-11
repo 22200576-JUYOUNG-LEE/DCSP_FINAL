@@ -2,13 +2,15 @@
 %% 1. w_cl SWEEP (Cleaned & Professional Layout)
 %%    Range: 19 ~ w_cl_max 
 %% ==========================================================
+Ts = 0.005;
 s = tf('s');
 zeta_cl = 1/sqrt(2);
 
 DZ  = 0.35;  
 SAT=24.3;
 
-Km=1300; 
+Km=1; 
+time_const = 0.0573;
 
 %% --- Find upper bound (including digital delay to see real margins) ---
 w_test  = 19:1:50; % Expanded test range
@@ -18,10 +20,8 @@ for w = w_test
     KI_t = (time_const/Km)*w^2;
     Gc_t = KP_t + KI_t/s;
     Gm_t = Km/(time_const*s + 1);
-    
-    % Including the digital delay (Ts) exposes the true upper bound!
-    Delay = (1 - (Ts/2)*s) / (1 + (Ts/2)*s); 
-    L_t  = Gc_t * Gm_t * Delay;
+
+    L_t  = Gc_t * Gm_t;
     
     [GM_t, PM_t] = margin(L_t);
     if 20*log10(GM_t) >= 10 && PM_t >= 45
@@ -60,10 +60,9 @@ for k = 1:N
     Gm   = Km/(time_const*s + 1);
     
     % Apply digital sampling delay to match real hardware behavior
-    Delay = (1 - (Ts/2)*s) / (1 + (Ts/2)*s);
-    L    = Gc * Gm * Delay;
+    Go    = Gc * Gm;
     
-    [re, im] = nyquist(L);
+    [re, im] = nyquist(Go);
     re = squeeze(re);
     im = squeeze(im);
     
@@ -105,21 +104,21 @@ fprintf('KI = %.4f\n', KI);
  
 Gc = KP + KI/s;
 Gm = Km/(time_const*s + 1);
-L  = Gc*Gm;
-T  = feedback(L,1);
+Go  = Gc*Gm;
+Gcl = Go/(1+ Go);
  
-[GM, PM, ~, ~] = margin(L);
+[GM, PM, ~, ~] = margin(Gcl);
 GM_dB = 20*log10(GM);
-fprintf('PM = %.2f deg  (%s)\n', PM,  tf_str(PM  >= 45));
-fprintf('GM = %.2f dB   (%s)\n', GM_dB, tf_str(GM_dB >= 10));
+fprintf('PM = %.2f deg  (%s)\n', PM);
+fprintf('GM = %.2f dB   (%s)\n', GM_dB);
  
-figure; margin(L); grid on; title('Open-loop Margin (nominal w_{cl}=23)');
+figure; margin(Go); grid on; title('Open-loop Margin (nominal w_{cl}=23)');
  
 %% Disturbance Rejection |P(jw)|
-P = -1/(1+L);
+P = -1/(1+Go);
 
 w = logspace(-1,3,500);     % rad/sec
-f = w/(2*pi);              % Hz
+f = w/(2*pi);               % Hz
 
 [mag,~] = bode(P,w);
 mag = squeeze(mag);

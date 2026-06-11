@@ -55,13 +55,4 @@ function Vali_plot(signal_type)
     title('Validation V_{cmd} vs \omega_{gyro}');
     legend('show', 'Location', 'best');
     hold off; grid on;
-
-    % figure(); 
-    % plot(Time, Vcmd_mean - Wgyro_mean,'b-', 'LineWidth',1.4);
-    % xlabel('Time[sec]','FontWeight','bold');
-    % ylabel('Error function V_{cmd}[V] - \omega_{gyro}[rad/sec]','FontWeight','bold');
-    % title("Error function normalized", 'FontWeight','bold');
-    % grid on;
-
- 
 end

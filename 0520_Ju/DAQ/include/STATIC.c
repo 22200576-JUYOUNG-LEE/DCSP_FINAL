@@ -2,8 +2,9 @@
 
 static double      Vcmd = 0.0;
 
-char OutDirName[N_NAME_BUFFER] = { 0 };
-char OutFileName[N_NAME_BUFFER] = { 0 };
+char OutDirName[NAME_BUFFER] = { 0 };
+char OutFileName[NAME_BUFFER] = { 0 };
+char OutDataFileName[NAME_BUFFER] = { 0 };
 
 double Static_Step(DynState s);
 void InitPath(void);
@@ -46,7 +47,8 @@ void StaticProperty(int Static_mode, int Iter_num){
         Vc_pos = STATIC_POSITIVE_START_POINT;
         Vc_neg = STATIC_NEGATIVE_START_POINT;
 
-        sprintf(OutDirName, "Static_iter%d.out", Iter_num);
+        strcpy(OutDirName, STATIC_DIR);
+        sprintf(OutFileName, "Static_iter%d.out", Iter_num);
 
         RUN_DAQ_mode = NON_LINEAR;
     }
@@ -57,6 +59,7 @@ void StaticProperty(int Static_mode, int Iter_num){
         Vc_neg = 0.0;
 
         strcpy(OutDirName, STATIC_DIR_LIN);
+        strcpy(OutFileName, STATIC_FILE);
 
         RUN_DAQ_mode = LINEAR;
     }
@@ -69,7 +72,7 @@ void StaticProperty(int Static_mode, int Iter_num){
 
             DAQ_Pause(STATIC_TIME_PAUSE);
 
-            if (j == STATIC_SIGN_POSITIVE) {
+            if (j == SIGN_POSITIVE) {
 
                 Vstep = (fabs(Vc_pos) > STATIC_CLOSE_NEGATIVE_POINT &&
                     fabs(Vc_pos) < STATIC_CLOSE_POSITIVE_POINT)
@@ -93,11 +96,11 @@ void StaticProperty(int Static_mode, int Iter_num){
             //printf("\nVcmd is %.2f\n", Vcmd);// -> nice work!
             //printf("idx_curr: %d\n", idx_curr); // -> nice work!
             
-            sprintf(OutFileName, "Static_Step_%.2f.out", Vcmd);
+            sprintf(OutDataFileName, "Static_Step_%.2f.out", Vcmd);
 
-            RunDAQ(STATIC_TIME_FINAL, STATIC_DATA_DIR, OutFileName, Static_Step);
-            printf("\nVcmd: %.3f", Vcmd);
-            printf("\nWgyro avg: %.4f \n", g_daqAvg.Wgyro);
+            RunDAQ(STATIC_TIME_FINAL, STATIC_DATA_DIR, OutDataFileName, Static_Step);
+            printf("\nVcmd: %.3f [V]", Vcmd);
+            printf("\nWgyro avg: %.4f [rad/s]\n", g_daqAvg.Wgyro);
 
             Summary_Vc_avg[idx_curr] =    g_daqAvg.Vcmd;
             Summary_Wgyro_avg[idx_curr] = g_daqAvg.Wgyro;
@@ -112,6 +115,7 @@ double Static_Step(DynState s) {
 }
 
 void InitPath(void) {
-    memset(OutFileName, 0, N_NAME_BUFFER);
-    memset(OutDirName, 0, N_NAME_BUFFER);
+    memset(OutFileName, 0, NAME_BUFFER);
+    memset(OutDirName, 0, NAME_BUFFER);
+    memset(OutDataFileName, 0, NAME_BUFFER);
 } 

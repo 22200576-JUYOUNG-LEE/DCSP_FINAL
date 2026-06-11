@@ -34,7 +34,7 @@ void RunMode(void)
         case MODE_VALIDATION:    StaticValidation();                 break;
         case MODE_BODE:          BodeMag();                          break;
         case MODE_POTEN:         Potentio();                         break;
-        case MODE_FORMAT:        Format();                           break;
+        case MODE_FORMAT:        Format(FORMAT_ANGLE_ZERO);               break;
         
         default: printf("[ERROR] Unknown mode:\n");                  break;
     }
@@ -99,9 +99,9 @@ void RunDAQ(double Final_time, const char* OutDirName, const char* OutFileName, 
             // @. Emergency Stop
             if (_kbhit()) {
                 keyboard_input = _getch();
-                if (keyboard_input == 'r') // 'r' = CW
+                if (keyboard_input == 'a') // 'r' = CW
                     Vc = DAQ_V_STANDARD + POTEN_EPS;
-                else if (keyboard_input == 'l') // 'l' = CCW
+                else if (keyboard_input == 'd') // 'l' = CCW
                     Vc = DAQ_V_STANDARD - POTEN_EPS;
                 else if (keyboard_input == 's')
                     break;
@@ -119,8 +119,6 @@ void RunDAQ(double Final_time, const char* OutDirName, const char* OutFileName, 
             if (RUN_DAQ_mode == LINEAR) Vc = Linearization(Vcmd);
             else Vc = Vcmd;
         }
-
-        
 
         // 3. Write and Read
         DAQ_Write(Vc);

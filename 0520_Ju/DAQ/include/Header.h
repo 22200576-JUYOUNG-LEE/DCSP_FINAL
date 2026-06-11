@@ -12,31 +12,31 @@
 #include <direct.h>
 #include "NIDAQmx.h"
 
-#define   N_STEP          (int)   ( FINAL_TIME*SAMPLING_FREQ )
-#define   FINAL_TIME      (double)(            4 )  // [Sec]
 #define   SAMPLING_FREQ   (double)(            200 ) // [Hz]
-#define   SETTLING_TIME   (double)( FINAL_TIME*0.5  ) // [2.5 sec]
 #define   SAMPLING_TIME   (double)( 1.0/SAMPLING_FREQ )
 #define   UNIT_PI         (double)( 3.14159265358979  )
 
-#define   N_NAME_BUFFER   (int)   (               256)
+#define   SIGN_POSITIVE  (int)(               0)
+#define   SIGN_NEGATIVE  (int)(               1)
+
+#define   NAME_BUFFER   (int)   (               256)
 
 #define   SCALE_RAD2DEG   (double) (180.0 / UNIT_PI)
 #define   SCALE_REV2DEG   (double) (360.0)
 
 #define   GYRO_V2RADS     (double) (1000.0 * UNIT_PI) / (0.67 * 180.0)
 
-#define   DEVICE_NUM      (int)    (                6)
-#define   NUM_A0_CHANNELS (int)    (                2)
-#define   NUM_AI_CHANNELS (int)    (                4) 
+#define   DEVICE_NUM      (int)    (6)
+#define   NUM_A0_CHANNELS (int)    (2)
+#define   NUM_AI_CHANNELS (int)    (4) 
 
-#define   N_MAX_BUFFER    (int)    (            100000)
+#define   N_MAX_BUFFER    (int)    (100000)
 
-#define   DAQ_V_STOP       (double) (              0.0)
-#define   DAQ_V_START      (double) (              5.0)
-#define   DAQ_V_STANDARD   (double) (              2.5)
+#define   DAQ_V_STOP       (double) (0.0)
+#define   DAQ_V_START      (double) (5.0)
+#define   DAQ_V_STANDARD   (double) (2.5)
 
-#define   V_POTEN         (double) (              5.0)
+#define   V_POTEN          (double) (5.0)
 
 
 #define CAL_AVG(num_data, Ybar_pre, Y) \
@@ -69,14 +69,13 @@
 #define   STATIC_DIR_LIN        (const char*)("Static_Linear")   
 #define   STATIC_FILE           (const char*)( "Static.out")
 #define   STATIC_DATA_DIR       (const char*)("Static_data")   
-#define   STATIC_SIGN_POSITIVE  (int)(               0)
-#define   STATIC_SIGN_NEGATIVE  (int)(               1)
+
 
 #define   LIN_V_DEADZONE        (double) (0.02)
 #define   LIN_ITER_MAX          (int) (1)
 
 #define   VALID_DIR             (const char*)("Validation")
-#define   VALID_ITER_MAX        (int) (3)
+#define   VALID_ITER_MAX        (int) (1)
 
 #define   VALID_TRI_TIME_PAUSE  (double) (2.0)
 #define   VALID_TRI_TIME_PERIOD (double)(30.0)
@@ -95,18 +94,25 @@
 #define   VALID_SIN_FREQ        (double)(0.01)
 #define   VALID_SIN_TIME_2      (double)(VALID_SIN_TIME_1+ 3 / VALID_SIN_FREQ)
 
-#define   BODE_ITER_MAX         (int) (15)
+#define   BODE_ITER_MAX         (int) (50)
 #define   BODE_DIR              (const char*)("BodeMag")
 #define   BODE_TIME_PAUSE       (double)(2.0)
-#define   BODE_ITER_START       (int) (0)
+#define   BODE_ITER_START       (int) (0.1)
 
-#define   BODE_SIN_FREQ_STEP    (double)(0.1)
+#define   BODE_SIN_FREQ_STEP    (double)(0.02)
 #define   BODE_SIN_TIME_FINAL   (double)(10)
 #define   BODE_SIN_AMPLITUDE    (double)(0.7)
 
-#define   POTEN_FINAL_TIME      (double)(8.0)
+#define   FORMAT_ANGLE_ZERO     (double)(0.0)
+
+#define   FORMAT_FINAL_TIME     (double)(3.0)
+#define   POTEN_FINAL_TIME      (double)(3.0)
+#define   POTEN_ITER_MAX        (int)(20)
+#define	  POTEN_DEG2V_POTER	    (double)(5.0/ 360.0)
+#define   POTEN_INIT_V          (double)(2.5)
 #define   POTEN_FILE            (const char*)("Poten.out")
 #define   POTEN_DATA_DIR        (const char*)("Poten_data") 
+#define   POTEN_SUMMARY_FILE    (const char*)("Poten_summary.out")
 #define   POTEN_EPS             (double)(1.0)
 
 
@@ -128,8 +134,8 @@ extern int          RUN_DAQ_mode;
 
 extern double       Vgyro_offset;
 
-extern char         OutDirName[N_NAME_BUFFER];
-extern char         OutFileName[N_NAME_BUFFER];
+extern char         OutDirName[NAME_BUFFER];
+extern char         OutFileName[NAME_BUFFER];
 
 typedef struct {
     const char* name;
@@ -192,7 +198,7 @@ void BodeMag();
 
 //7. Potien.c
 void Potentio();
-void Format();
+void Format(double Vpoten);
 double FORMAT_func(DynState s);
 
 

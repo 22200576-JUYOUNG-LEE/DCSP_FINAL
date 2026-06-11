@@ -1,63 +1,85 @@
-function [coeff_pos, coeff_neg, coeff_dz, pos_start, neg_start] = Get_fitting_Quadratic(Vc, Wgyro, order)
-
+function [coeff_pos, coeff_neg, coeff_dz, V_pos_start, V_neg_start] = Get_fitting_Quadratic(Vc, Wgyro)
     % =========================================================
-    % parameters
+    % SYSTEM PARA
     % =========================================================
-    pos_start = 64.87;    % (CW) DZ_START [deg/s]
-    pos_end   = 941.97;   % (CW) SAT_END [deg/s]
+    Linslope  = 1300;     % 변환 상수 K
+    order     = 4;        % 정/역방향 4차 고정
+    dz_order  = 3;        % 데드존 3차 고정
 
-    neg_start = -67.2453; % (CCW) DZ_START [deg/s]
-    neg_end   = -905.685; % (CCW) SAT_END [deg/s]
+    % 오리지널 속도 경계값 [deg/s]
+    pos_start = 57.2428; %<--    
+    pos_end   = 1135;   
+    neg_start = -76.1736; 
+    neg_end   = -1120; 
 
-    dz_order  = 3;        % DEADZONE FITTING 
+    % 입력 제어 명령(vin) 기준의 경계값으로 변환
+    V_pos_start = pos_start / Linslope;
+    V_pos_end   = pos_end / Linslope;
+    V_neg_start = neg_start / Linslope;
+    V_neg_end   = neg_end / Linslope;
+
+    % 
+    vin_data = Wgyro / Linslope; 
 
     % (Operating Point) 
-    OperPoint_Vcmd = pos_start;
-    [~, OperPoint_idx] = min(abs(Wgyro - OperPoint_Vcmd));
+    OperPoint_Vcmd = V_pos_start;
+    [~, OperPoint_idx] = min(abs(vin_data - OperPoint_Vcmd));
     OperPoint_Vc = Vc(OperPoint_idx);
 
     % =========================================================
-    % (Region Selection)
+    % 구간 분할 (Region Selection - vin_data 기준)
     % =========================================================
-    pos_region = (Wgyro >= pos_start) & (Wgyro <= pos_end);
-    neg_region = (Wgyro >= neg_end) & (Wgyro <= neg_start);
-    dz_region  = (Wgyro < pos_start) & (Wgyro > neg_start); 
+    pos_region = (vin_data >= V_pos_start) & (vin_data <= V_pos_end);
+    neg_region = (vin_data >= V_neg_end) & (vin_data <= V_neg_start);
+    dz_region  = (vin_data <= V_pos_start) & (vin_data >= V_neg_start);
+
 
     % =========================================================
-    % (Polynomial Fitting)
+    % 다항식 피팅 (X축을 vin_data로 설정하여 계수 추출)
     % =========================================================
-    % 1. CW & CCW FITTING WITH GIVEN ORDER
-    coeff_pos = polyfit(Wgyro(pos_region), Vc(pos_region), order);
-    coeff_neg = polyfit(Wgyro(neg_region), Vc(neg_region), order);
+    coeff_pos = polyfit(vin_data(pos_region), Vc(pos_region), order);
+    coeff_neg = polyfit(vin_data(neg_region), Vc(neg_region), order);
 
-    % 2. DEADZONE FITTING with 3rd ORDER
-    coeff_dz  = polyfit(Wgyro(dz_region), Vc(dz_region), dz_order); 
+    % ========================================================
+    
+
+
+    coeff_dz  = polyfit(vin_data(dz_region), Vc(dz_region), dz_order); 
 
     % =========================================================
-    % (LIN_COEF.csv)
+    % 데이터 저장 (LIN_COEF.csv)
     % =========================================================
-    % NAN PEDDING 
     coeff_dz_data = nan(1, length(coeff_pos)); 
     coeff_dz_data(1:length(coeff_dz)) = coeff_dz;
     
     header_row = nan(1, length(coeff_pos));
     header_row(1:2) = [OperPoint_Vcmd, OperPoint_Vc];
-
     data_matrix = [header_row; coeff_pos; coeff_neg; coeff_dz_data];
     writematrix(data_matrix, '..\data\LIN_COEF.csv'); 
 
+
+    % ========================================================
+    % 그래프 한번에 띄우기
+    % ========================================================
+    Vc_fit = nan(size(vin_data));
+    % 각 논리 배열(Region) 위치에 맞는 피팅 값 대입
+    Vc_fit(pos_region) = polyval(coeff_pos, vin_data(pos_region));
+    Vc_fit(neg_region) = polyval(coeff_neg, vin_data(neg_region));
+    Vc_fit(dz_region)  = polyval(coeff_dz, vin_data(dz_region));
+
+    [vin_sorted, sort_idx] = sort(vin_data);
+    Vc_fit_sorted          = Vc_fit(sort_idx);
+
     % =========================================================
-    % (Plot)
+    % 시각화 (Plot)
     % =========================================================
     figure(); hold on; grid on; box on;
-
-    plot(Wgyro, Vc, 'b.', 'LineWidth', 1.5, 'DisplayName', 'Dataset');
-    plot(Wgyro(pos_region), polyval(coeff_pos, Wgyro(pos_region)), 'r-', 'LineWidth', 2, 'DisplayName', 'Positive Fit');
-    plot(Wgyro(neg_region), polyval(coeff_neg, Wgyro(neg_region)), 'm-', 'LineWidth', 2, 'DisplayName', 'Negative Fit');
-    plot(Wgyro(dz_region), polyval(coeff_dz, Wgyro(dz_region)), 'g-', 'LineWidth', 2, 'DisplayName', 'Deadzone Fit (3rd)');
-
-    xlabel('\omega_{gyro} [deg/s]', 'FontWeight', 'bold');
+    plot(vin_data, Vc, 'b.', 'LineWidth', 1.5, 'DisplayName', 'Dataset');
+    % plot(vin_data(pos_region), polyval(coeff_pos, vin_data(pos_region)), 'r-', 'LineWidth', 2, 'DisplayName', 'Positive Fit');
+    % plot(vin_data(neg_region), polyval(coeff_neg, vin_data(neg_region)), 'm-', 'LineWidth', 2, 'DisplayName', 'Negative Fit');
+    % plot(vin_data(dz_region), polyval(coeff_dz, vin_data(dz_region)), 'g-', 'LineWidth', 2, 'DisplayName', 'Deadzone Fit (3rd)');
+    plot(vin_data, Vc_fit, 'r-', 'LineWidth', 2, 'DisplayName', 'Total Piecewise Fit');
+    xlabel('Control Input v_{in}', 'FontWeight', 'bold');
     ylabel('V_c [V]', 'FontWeight', 'bold');
     legend('Location', 'best');
-
 end

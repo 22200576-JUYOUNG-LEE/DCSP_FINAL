@@ -10,7 +10,7 @@ nrmse_list  = [];
 amp_ratio_list  = [];
 phase_err_list  = [];
 
-for f_val = 0.2:0.2:2.0
+for f_val = 0.2:0.1:1.5
     validation_fn = sprintf('%sBodeMag_sin_freq%.2f.out', path, f_val);
     if ~isfile(validation_fn), continue; end
 

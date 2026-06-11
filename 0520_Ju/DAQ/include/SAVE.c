@@ -12,8 +12,8 @@ double GetWindowTime(void)
 
 void SaveDataset(const char* OutDirName, const char* OutFileName, const Dataset* Out_Dataset, const int num_col, const int num_row) {
 
-    char DirPath[N_NAME_BUFFER];
-    char FilePath[N_NAME_BUFFER];
+    char DirPath[NAME_BUFFER];
+    char FilePath[NAME_BUFFER];
     FILE* pFile = NULL;
 
     snprintf(DirPath, sizeof(DirPath), "../data/%s", OutDirName);
