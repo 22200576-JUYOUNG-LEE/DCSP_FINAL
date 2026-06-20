@@ -56,11 +56,11 @@ double Format_func(DynState s)
 	double velocity = 0.0;
 	double Vcmd = 0.0;
 
-	velocity = s.Vpoten - Vp;
+	velocity = s.Angle - Vp;
 	Vcmd = velocity * FORMAT_FUNC_K;
 
 	if (Vcmd < LIN_V_DEADZONE && Vcmd > -LIN_V_DEADZONE) Vcmd = LIN_V_DEADZONE;
 
-	if (s.Vpoten > Vp)  return -Vcmd;
+	if (s.Angle > Vp)  return -Vcmd;
 	else				return -Vcmd;
 }

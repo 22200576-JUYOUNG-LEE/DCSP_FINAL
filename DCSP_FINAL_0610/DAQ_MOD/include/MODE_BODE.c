@@ -2,10 +2,7 @@
 
 double freq = 0.0;
 
-static double Bode_sin(DynState s)
-{
-    return BODE_SIN_AMPLITUDE * sin(2.0 * UNIT_PI * freq * (s.Time));
-}
+double Bode_sin(DynState s);
 
 void BodeMag(void)
 {
@@ -25,4 +22,9 @@ void BodeMag(void)
 
         MotorDynamic(BODE_SIN_TIME_FINAL, BODE_DIR, OutFileName, Bode_sin);
     }
+}
+
+double Bode_sin(DynState s)
+{
+    return BODE_SIN_AMPLITUDE * sin(2.0 * UNIT_PI * freq * (s.Time));
 }

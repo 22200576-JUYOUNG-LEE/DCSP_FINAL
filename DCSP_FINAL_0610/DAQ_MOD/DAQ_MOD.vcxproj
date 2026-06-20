@@ -21,11 +21,13 @@
   <ItemGroup>
     <ClCompile Include="include\MODE_BODE.c" />
     <ClCompile Include="include\DAQ.c" />
+    <ClCompile Include="include\MODE_DAQ_CHECK.c" />
     <ClCompile Include="include\MODE_DESIG.c" />
     <ClCompile Include="include\Linearization.c" />
     <ClCompile Include="include\MODE.c" />
     <ClCompile Include="include\Format.c" />
-    <ClCompile Include="include\MotorDynamics.c" />
+    <ClCompile Include="include\MODE_STABIL.c" />
+    <ClCompile Include="include\MotorDynamic.c" />
     <ClCompile Include="include\MODE_STATIC.c" />
     <ClCompile Include="include\MODE_VALID.c" />
     <ClCompile Include="system.c" />

@@ -11,8 +11,6 @@ void InitAvg(void) {
     Data_avg.Angle = 0.0;
 }
 
-
-
 void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFileName, DynFn fn) {
 
     float64     Vin[NUM_AI_CHANNELS] = { 0.0 };
@@ -26,30 +24,34 @@ void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFile
     double      time_init = 0.0;    //[sec]
     double      time = 0.0;         //[sec]
 
-    double      Command = 0.0;         //[V]
-    double      Vc = DAQ_V_STANDARD;//[V]
-    double      Vgyro = 0.0;        //[V]
-    double      Vpoten = 0.0;       //[V]
-    double      Wgyro = 0.0;        //[rad/sec]  
+    double      Disturbance_input   = 0.0; // [???]
+    double      Disturbance_raw     = 0.0; // [???]
+    double      Command             = 0.0; //[V]
+    double      Vc                  = DAQ_V_STANDARD;// [V]
+    double      Vgyro               = 0.0; // [V]
+    double      Wgyro               = 0.0; // [rad/sec]  
+    double      Angle               = 0.0; // [rad]
 
-    static double      Out_Time[N_MAX_BUFFER] = { 0.0, };
-    static double      Out_Command[N_MAX_BUFFER] = { 0.0, };
-    static double      Out_Vgyro[N_MAX_BUFFER] = { 0.0, };
-    static double      Out_Angle[N_MAX_BUFFER] = { 0.0, };
-    static double      Out_Wgyro[N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Time         [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Command      [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Vgyro        [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Angle        [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Wgyro        [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Disturbance  [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Disturbance_raw  [N_MAX_BUFFER] = { 0.0, };
 
-    DynState s = { time, Command, Wgyro, Vpoten };
+    DynState s = { time, Command, Wgyro, Angle };
 
     Dataset     Out_DAQ_Dataset[] = {
         {"Time[sec]",               Out_Time},
         {"\\omega_{cmd}[rad/s]",    Out_Command},
         {"V_{gyro}[V]",             Out_Vgyro},
         {"\\omega_{gyro}[rad/s]",   Out_Wgyro},
-        {"\\theta[rad]",            Out_Angle}
+        {"\\theta[rad]",            Out_Angle},
+        {"\\omega_{dist}[rad/s]",   Out_Disturbance},
+        {"\\omega_{distRaw}[V]",   Out_Disturbance_raw}
     };
     int         numDataset = sizeof(Out_DAQ_Dataset) / sizeof(Out_DAQ_Dataset[0]);
-
-    double keyboard_input = 0.0;
 
     InitAvg();
 
@@ -64,7 +66,7 @@ void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFile
         s.Time = time;
         s.Command = Command;
         s.Wgyro = Wgyro;
-        s.Vpoten = Vpoten;
+        s.Angle = Angle;
 
         // 2. Processing
         if (fn != NULL) Command = fn(s);
@@ -76,17 +78,21 @@ void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFile
         DAQ_Write(Vc);
         DAQ_Read(Vin);
 
-        Vgyro = Vin[2];
-        Wgyro = (Vgyro - Vgyro_offset) * (V_GYRO2RAD);
-        Vpoten = Vin[3];
+
+        Disturbance_input   = (Vin[0] - Vgyro_offset) * (V_GYRO2RAD);
+        Disturbance_raw     = Vin[0]                                ;
+        Vgyro               = Vin[2]                                ;
+        Wgyro               = (Vgyro - Vgyro_offset) * (V_GYRO2RAD);
+        Angle               = V_POTEN2RAD(Vin[3]);
 
         // 4. Save to buffers
-        Out_Time[count] = time;
-        Out_Command[count] = Command;
-        Out_Vgyro[count] = Vin[2];
-        Out_Wgyro[count] = Wgyro;
-        Out_Angle[count] = V_POTEN2RAD(Vpoten);
-        
+        Out_Time            [count] = time;
+        Out_Command         [count] = Command;
+        Out_Vgyro           [count] = Vin[2];
+        Out_Wgyro           [count] = Wgyro;
+        Out_Angle           [count] = Angle;
+        Out_Disturbance     [count] = Disturbance_input;
+        Out_Disturbance_raw [count] = Disturbance_raw;
 
         if (count >= idx_max / 2) {
             count_avg++;

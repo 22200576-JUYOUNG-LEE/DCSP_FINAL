@@ -21,7 +21,7 @@ double Designation_Control(DynState s) {
     double target_deg = 80.0;
 
     // 2. sensor data [deg], [deg/s]
-    double current_deg = V_POTEN2RAD(s.Vpoten);
+    double current_deg = s.Angle;
     double current_rate_deg = s.Wgyro;
 
     // 3. error calculation ()

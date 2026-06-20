@@ -3,7 +3,7 @@
 function BODE_plot(base_dir)
     Time = [];
     
-    for idx = 0.2 :0.2: 5
+    for idx = 0.3 :0.2: 1.3
         % 1. 동적 파일 이름 및 레전드 이름 생성
         filename = sprintf('%sBodeMag_sin_freq%.2f.out', base_dir, idx);
     

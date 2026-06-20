@@ -37,12 +37,12 @@ void ReadLinearCoefficent(void) {
         exit(1);
     }
 
-    // 2nd Row obtained: 5 cols
+    // 1st Row obtained: 5 cols
     if (fgets(buffer, sizeof(buffer), fp) != NULL) {
         sscanf(buffer, "%lf,%lf,%lf,%lf,%lf", &a1, &b1, &c1, &d1, &e1);
     }
 
-    // 3rd Row obtained: 5 cols
+    // 2nd Row obtained: 5 cols
     if (fgets(buffer, sizeof(buffer), fp) != NULL) {
         sscanf(buffer, "%lf,%lf,%lf,%lf,%lf", &a2, &b2, &c2, &d2, &e2);
     }

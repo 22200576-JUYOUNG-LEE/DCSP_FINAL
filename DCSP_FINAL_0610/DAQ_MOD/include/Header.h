@@ -19,7 +19,7 @@
 #define   N_NAME_BUFFER   (int)   (256)
 #define   N_MAX_BUFFER    (int)   (100000)
 
-#define   DEVICE_NUM      (int)    (6)
+#define   DEVICE_NUM      (int)    (9)
 #define   NUM_A0_CHANNELS (int)    (2)
 #define   NUM_AI_CHANNELS (int)    (4) 
 
@@ -40,6 +40,12 @@
 #define   RUN_MODE_NONLINEAR    (int) (0)
 #define   RUN_MODE_LINEAR       (int) (1)
 #define   RUN_MODE_USER_INPUT   (int) (2)
+
+#define   CHECK_SIN_AMPLITUDE   (double)(2.5)
+#define   CHECK_OFFSET          (double)(2.5)
+#define   CHECK_DIR             (const char*)("Check_DAQ")
+#define   CHECK_FILE            (const char*)("Checking_data.out")
+#define   CHECK_TIME_FINAL      (double)(5.0)
 
 #define   OFFSET_TIME           (double) (              5.0)
 #define   OFFSET_DIR            (const char*)(     "Offset")
@@ -118,16 +124,24 @@
 #define   DESIGNATION_TIME_FINAL    (double)(1.0)
 #define   DESIGNATION_TIME_PAUSE    (double)(1.0)
 
+#define   STABILIZATION_DIR        (const char*)("Stabilization")
+#define   STABILIZATION_FILE       (const char*)("Stabil_Dynamics.out")
+#define   STABILIZATION_CONSTANT_P (double)(1.9376)
+#define   STABILIZATION_CONSTANT_I (double)(54.4581)
+#define   STABILIZATION_FINAL_TIME (double)(30.0)
+
 typedef enum {
+    MODE_CHECK_DAQ      = 0,
     MODE_STATIC         = 1,
     MODE_VALIDATION     = 2, 
     MODE_BODE           = 3,
     MODE_POTEN          = 4,
     MODE_DESIGNATION    = 5,
+    MODE_STABIL         = 6,
 
 
 
-    N_MODE              = 5,
+    N_MODE              = 7,
 } Mode;
 
 extern TaskHandle   taskAI;
@@ -146,10 +160,10 @@ typedef struct {
 } Dataset;
 
 typedef struct {
-    double Time;
-    double Command;
-    double Wgyro;
-    double Vpoten;
+    double Time;        // [sec]
+    double Command;     // [rad/s]
+    double Wgyro;       // [rad/s]
+    double Angle;       // [rad]
 } DynState;
 
 typedef double (*DynFn)(DynState s);
@@ -164,14 +178,14 @@ typedef struct {
 extern DAQ_Averages Data_avg;
 
 
-// 1. myWin.c
-
+// 1. MODE_DAQ_CHECK.c
+void Check_DAQ(void);
 
 // myMode.c
 Mode SelectOperatingMode(void);
 void RunMode(void);
 
-// RUN_DAQ.c
+// MotorDynamic.c
 void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFileName, DynFn fn);
 
 // 2. myDAQ.c
@@ -208,5 +222,8 @@ void Format(double Angle);
 void   Designation(void);
 double Designation_Control(DynState s);
 
+//9. MODE_STABIL.C
+void Stabilization(void);
+void Stabilization_Control(DynState s);
 
 #endif

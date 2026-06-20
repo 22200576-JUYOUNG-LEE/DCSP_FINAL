@@ -36,13 +36,19 @@
     <ClCompile Include="include\MODE_BODE.c">
       <Filter>헤더 파일</Filter>
     </ClCompile>
-    <ClCompile Include="include\MotorDynamics.c">
+    <ClCompile Include="include\MotorDynamic.c">
       <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="include\Linearization.c">
       <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="include\Format.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\MODE_STABIL.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="include\MODE_DAQ_CHECK.c">
       <Filter>헤더 파일</Filter>
     </ClCompile>
   </ItemGroup>

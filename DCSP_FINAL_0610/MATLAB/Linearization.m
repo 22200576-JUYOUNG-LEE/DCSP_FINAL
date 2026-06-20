@@ -8,7 +8,7 @@ close all;
 %--------------------------------------------------------------------------
 % Import Static Property 
 %--------------------------------------------------------------------------
-for idx = 1 : 4
+for idx = 1 : 3
 
     current_file = sprintf('../data/Static/Static_iter%d.out', idx);
 
