@@ -2,9 +2,9 @@
 % title: Band Pass Filter (BPF) test
 % author: Juyoung Lee
 
-clear; clc; close all;
+% clear; clc; close all;
 
-fileName = 'BodeMag_sin_freq0.50.out';
+fileName = 'Stabil_Dynamics.out';
 DAQ_data_values = readmatrix(fileName, 'NumHeaderLines', 1, 'FileType', 'text');
 
 % =========================================================================
@@ -39,7 +39,7 @@ DAQ_fft_positive(2:end-1, :)    = 2 * DAQ_fft_positive(2:end-1, :); % DC 성분 
 DAQ_FFT_Matrix      = [DAQ_freq_axis', DAQ_fft_positive];
 
 
-figure(1); hold on;
+figure(5); hold on;
 plot(DAQ_time_uniform, DAQ_Wgyro_data, 'b');
 title(fileName);
 
@@ -52,7 +52,7 @@ title(fileName);
 % =========================================================================
 % analoge
 Wc                              = 0.5*2*pi;
-passBand                        = Wc / 2;
+passBand                        = Wc / 5;
 Wc_range                        = [Wc-passBand; Wc+passBand]; 
 [CT_LPF_NUM, CT_LPF_DEN]        = butter(1, Wc_range, 'band', 's');
 Hs                              = tf(CT_LPF_NUM, CT_LPF_DEN); % CT transfer function
@@ -70,8 +70,8 @@ DAQ_fft_mag                     = abs(DAQ_fft_result / DAQ_length);
 DAQ_fft_positive                = DAQ_fft_mag(1:floor(DAQ_length/2)+1, :);
 DAQ_fft_positive(2:end-1, :)    = 2 * DAQ_fft_positive(2:end-1, :); % DC 성분 제외 2배 보정
 
-figure(1); 
-plot(DAQ_time_uniform,BPFed_Wgyro, 'r', DAQ_time_uniform, BPFed_Wcmd, 'g');
+figure(5); 
+plot(DAQ_time_uniform,BPFed_Wgyro, DAQ_time_uniform, BPFed_Wcmd, LineWidth=1.2);
 
 figure(4);
 plot(DAQ_freq_axis, DAQ_fft_positive, 'r');

@@ -8,7 +8,7 @@ close all;
 %--------------------------------------------------------------------------
 % Import Static Property 
 %--------------------------------------------------------------------------
-for idx = 1 : 3
+for idx = 1 : 11
 
     current_file = sprintf('../data/Static/Static_iter%d.out', idx);
 
@@ -35,8 +35,8 @@ Vm = Mean_Motor_Volt ;           % mean of motor driving voltage [V]
 %-------------------------------------------------------------------------- 
 
 % Motor Angular Speed  
-MAX_RATE = 800; % [deg/s]  
-MIN_RATE = 30; % [deg/s]  
+MAX_RATE = 1300; % [deg/s]  
+MIN_RATE = 50; % [deg/s]  
 
 % Extract Data Points for CW and CCW Directions  
 [~,idxN1]= min(abs(Wg - (-MAX_RATE))) ; % CCW direction   
@@ -53,11 +53,11 @@ CoefN = polyfit(Wg(idxN1:idxN2), Vm(idxN1:idxN2), 4);
 %-------------------------------------------------------------------------- 
 % Validity Check of Linearization Algorithm  
 %-------------------------------------------------------------------------- 
-bufWc = -700:1:700 ; % control command of a stabilization loop   
+bufWc = -1200:1:1200 ; % control command of a stabilization loop   
 N = length(bufWc) ;  
 
-Wc_DZ  = 20.0 ; % desired dead-zone  [deg/s]  
-Wc_SAT = 1000.0 ; % desired saturation [deg/s]   
+Wc_DZ  = 50.0 ; % desired dead-zone  [deg/s]  
+Wc_SAT = 1300.0 ; % desired saturation [deg/s]   
 
 for idx = 1 : N
     Wc = bufWc(idx) ; % control command  
@@ -81,7 +81,7 @@ for idx = 1 : N
          
     else % Deadzone  
  
-        Vcmd(idx) = 2.5 ; % stop voltage is issued to the motor    
+        Vcmd(idx) = 2.5 ; % stop voltage is issued to    the motor    
  
     end
     
@@ -106,9 +106,11 @@ legend({'static characteristics: V_{m} = g(\omega_{out})',...
 grid on, box on, xlabel('Wc [deg/s]', 'FontSize',12), ylabel('Vcmd [V]', 'FontSize',12) 
 set(gca, 'FontSize',12) 
  
-figure(2), plot(bufWc, Wout, 'LineWidth',2),  
+figure(2), hold on;
+plot(bufWc, Wout, 'LineWidth',2),  
+plot(bufWc, bufWc, 'LineWidth',1.5);
 title('Expected Linearization Result', 'FontSize',13)  
-legend({'\omega_{c} --> f^{-1}(\omega_{c}) = V_{m} --> motor f(\cdot) --> \omega_{out}'}, ...
+legend({'\omega_{c} --> f^{-1}(\omega_{c}) = V_{m} --> motor f(\cdot) --> \omega_{out}', 'Linear Line'}, ...
     'FontSize',12)  
 grid on, box on, xlabel('Wc [deg/s]', 'FontSize',12), ylabel('Wout [deg/s]', 'FontSize',12) 
 set(gca, 'FontSize',12) 

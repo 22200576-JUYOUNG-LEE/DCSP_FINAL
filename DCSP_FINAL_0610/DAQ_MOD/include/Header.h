@@ -19,12 +19,12 @@
 #define   N_NAME_BUFFER   (int)   (256)
 #define   N_MAX_BUFFER    (int)   (100000)
 
-#define   DEVICE_NUM      (int)    (9)
+#define   DEVICE_NUM      (int)    (3)
 #define   NUM_A0_CHANNELS (int)    (2)
 #define   NUM_AI_CHANNELS (int)    (4) 
 
 #define   DAQ_V_STOP       (double) (0.0)
-#define   DAQ_V_START      (double) (5.0)
+#define   DAQ_V_START      (double) (3.0)
 #define   DAQ_V_STANDARD   (double) (2.5)
 
 #define   SCALE_RAD2DEG   (double) (180.0 / UNIT_PI)
@@ -51,16 +51,15 @@
 #define   OFFSET_DIR            (const char*)(     "Offset")
 #define   OFFSET_FILE           (const char*)( "Offset.out")
       
-#define   STATIC_ITER_MAX       (int)(2)
-#define   STATIC_NEGATIVE_START_POINT   (double)(2.3)
-#define   STATIC_POSITIVE_START_POINT   (double)(2.7)
-#define   STATIC_CLOSE_NEGATIVE_POINT   (double)(2.2)
-#define   STATIC_CLOSE_POSITIVE_POINT   (double)(2.8)
-#define   STATIC_WIDE_STEP      (double)(0.02)
+#define   STATIC_ITER_MAX       (int)(10)
+#define   STATIC_NEGATIVE_START_POINT   (double)(2.26)
+#define   STATIC_POSITIVE_START_POINT   (double)(2.74)
+#define   STATIC_CLOSE_NEGATIVE_POINT   (double)(2.16)
+#define   STATIC_CLOSE_POSITIVE_POINT   (double)(2.84)
+#define   STATIC_WIDE_STEP      (double)(0.1)
 #define   STATIC_CLOSE_STEP     (double)(0.02)
-#define   STATIC_N_SWEEP        (int)       ( 80)
-#define   STATIC_TIME_PAUSE     (double)    (1.0)
-#define   STATIC_TIME_DELAY     (double)    (0.5)
+#define   STATIC_N_SWEEP        (int)       ( 50)
+#define   STATIC_TIME_PAUSE     (double)    (0.5)
 #define   STATIC_TIME_FINAL     (double)    (4.0)
 #define   STATIC_DIR            (const char*)(     "Static")   
 #define   STATIC_DIR_LIN        (const char*)("Static_Linear")   
@@ -73,14 +72,14 @@
       (fabs(val) < STATIC_CLOSE_POSITIVE_POINT)) \
      ? STATIC_CLOSE_STEP : STATIC_WIDE_STEP)
 
-#define   LIN_MAX_RATE          (double) (1000.0)
+#define   LIN_MAX_RATE          (double) (1300.0)
 #define   LIN_V_DEADZONE        (double) (20.0)
 #define   LIN_ITER_MAX          (int) (1)
 
 #define   VALID_DIR             (const char*)("Validation")
 #define   VALID_ITER_MAX        (int) (1)
 
-#define   VALID_TRI_AMPLITUDE         (double)(15.0)
+#define   VALID_TRI_AMPLITUDE   (double)(24.0)
 #define   VALID_TRI_TIME_PAUSE  (double) (2.0)
 #define   VALID_TRI_TIME_PERIOD (double)(30.0)
 #define   VALID_TRI_SLOPE       (double)(VALID_TRI_AMPLITUDE/ VALID_TRI_TIME_PERIOD)
@@ -92,18 +91,17 @@
 #define   VALID_TRI_TIME_FINAL  (double)(VALID_TRI_TIME_POINT5 + VALID_TRI_TIME_PERIOD + 1)
 
 #define   VALID_SIN_TIME_PAUSE  (double)(1.0)
-#define   VALID_SIN_AMPLITUDE   (double)(15.0)
+#define   VALID_SIN_AMPLITUDE   (double)(25.0)
 #define   VALID_SIN_TIME_FINAL  (double)(VALID_SIN_TIME_2 +1)
 #define   VALID_SIN_TIME_1      (double)(1.0)
 #define   VALID_SIN_FREQ        (double)(0.01)
 #define   VALID_SIN_TIME_2      (double)(VALID_SIN_TIME_1+ 3 / VALID_SIN_FREQ)
 
-#define   BODE_ITER_MAX         (int) (50)
+#define   BODE_ITER_MAX         (int) (20)
 #define   BODE_DIR              (const char*)("BodeMag")
 #define   BODE_TIME_PAUSE       (double)(2.0)
 #define   BODE_INIT_FREQ        (double)(0.1)
-
-#define   BODE_SIN_FREQ_STEP    (double)(0.1)
+#define   BODE_SIN_FREQ_STEP    (double)(0.02)
 #define   BODE_SIN_TIME_FINAL   (double)(10.0)
 #define   BODE_SIN_AMPLITUDE    (double)(8.0)
 
@@ -126,8 +124,8 @@
 
 #define   STABILIZATION_DIR        (const char*)("Stabilization")
 #define   STABILIZATION_FILE       (const char*)("Stabil_Dynamics.out")
-#define   STABILIZATION_CONSTANT_P (double)(1.9376)
-#define   STABILIZATION_CONSTANT_I (double)(54.4581)
+#define   STABILIZATION_CONSTANT_P (double)(2.4141)
+#define   STABILIZATION_CONSTANT_I (double)(62.6297)
 #define   STABILIZATION_FINAL_TIME (double)(30.0)
 
 typedef enum {

@@ -1,6 +1,6 @@
 function [freqs, gains, phases] = generate_bode_plot(data_dir)
     % Define frequency range as per your files
-    search_freqs = 0.3:0.01:1.3; 
+    search_freqs = 0.3:0.01:1.0; 
     
     valid_freqs = [];
     gains_raw = [];
@@ -12,11 +12,10 @@ function [freqs, gains, phases] = generate_bode_plot(data_dir)
         
         data = readmatrix(fn, 'FileType', 'text', 'NumHeaderLines', 1);
         t = data(1000:end, 1);
-        u = data(1000:end, 2); % V_cmd -->  Now change to [deg/sec]
-        y = data(1000:end, 4); % theta
+        u = data(1000:end, 2); 
+        y = data(1000:end, 4); 
 
 
-        
         w = 2 * pi * f;
         H = [sin(w*t), cos(w*t), ones(size(t))];
         
