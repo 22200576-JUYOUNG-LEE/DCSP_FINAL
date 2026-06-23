@@ -19,25 +19,12 @@ DAQ_time            = DAQ_data_values(:, 1);
 DAQ_length          = length(DAQ_time);
 DAQ_dt              = DAQ_time(2) - DAQ_time(1); % 샘플링 주기
 DAQ_time_uniform    = linspace(DAQ_time(1), DAQ_time(end), DAQ_length)';
+DAQ_Wgyro_data      = DAQ_data_values(:, 4);
+DAQ_Wb_data         = DAQ_data_values(:, )
 
-DAQ_Fs              = 1 / DAQ_dt;                % 샘플링 주파수
+fft_sampling        = 1000;                % 샘플링 주파수
 
-% 2. X축이 될 주파수 배열 생성 (단방향)
-DAQ_freq_axis   = DAQ_Fs * (0:floor(DAQ_length/2)) / DAQ_length;
-
-% 3. 실제 Wgyro 데이터(2열부터 끝까지) 뽑아서 한 번에 FFT 연산
-DAQ_Wgyro_data      = DAQ_data_values(1:end, 4);
-DAQ_Wcmd_data       = DAQ_data_values(1:end, 2);
-DAQ_fft_result      = fft(DAQ_Wgyro_data); % 한 번에 FFT 가능
-
-% 4. FFT 크기(Magnitude) 변환 및 단방향(Positive) 절단
-DAQ_fft_mag                     = abs(DAQ_fft_result / DAQ_length);
-DAQ_fft_positive                = DAQ_fft_mag(1:floor(DAQ_length/2)+1, :);
-DAQ_fft_positive(2:end-1, :)    = 2 * DAQ_fft_positive(2:end-1, :); % DC 성분 제외 2배 보정
-
-% 5. 주파수 X축(1열)과 FFT 결과(나머지 열)를 하나의 Matrix로 합체!
-DAQ_FFT_Matrix      = [DAQ_freq_axis', DAQ_fft_positive];
-
+[DAQ_freq_axis, DAQ_fft_positive] = FFT_1D(DAQ_time_uniform, DAQ_Wgyro_data,fft_sampling);
 
 figure(5); hold on;
 plot(DAQ_time_uniform, DAQ_Wgyro_data, 'b');
@@ -52,18 +39,11 @@ title(fileName);
 % =========================================================================
 % analoge
 Wc                              = 0.5*2*pi;
-passBand                        = Wc / 5;
-Wc_range                        = [Wc-passBand; Wc+passBand]; 
-[CT_LPF_NUM, CT_LPF_DEN]        = butter(1, Wc_range, 'band', 's');
-Hs                              = tf(CT_LPF_NUM, CT_LPF_DEN); % CT transfer function
 
-% digital
-Hz_tustin                       = c2d(Hs, DAQ_dt, 'tustin');
-[DT_tustin_NUM, DT_tustin_DEN]  = tfdata(Hz_tustin, 'v');
+Wgyro_BPF                       = BPF_1D(Time_uniform, DAQ_Wgyro_data, Wc/5);
+Wgyro_BPF                       = BPF_1D(Time_uniform, DAQ_)
 
-BPFed_Wgyro                     = lsim(Hz_tustin, DAQ_Wgyro_data, DAQ_time_uniform);
-BPFed_Wcmd                      = lsim(Hz_tustin, DAQ_Wcmd_data, DAQ_time_uniform);
-DAQ_fft_result                  = fft(BPFed_Wgyro); % 한 번에 FFT 가능
+DAQ_fft_result                  = fft(Wgyro_BPF); % 한 번에 FFT 가능
 
 % 4. FFT 크기(Magnitude) 변환 및 단방향(Positive) 절단
 DAQ_fft_mag                     = abs(DAQ_fft_result / DAQ_length);
@@ -71,7 +51,7 @@ DAQ_fft_positive                = DAQ_fft_mag(1:floor(DAQ_length/2)+1, :);
 DAQ_fft_positive(2:end-1, :)    = 2 * DAQ_fft_positive(2:end-1, :); % DC 성분 제외 2배 보정
 
 figure(5); 
-plot(DAQ_time_uniform,BPFed_Wgyro, DAQ_time_uniform, BPFed_Wcmd, LineWidth=1.2);
+plot(DAQ_time_uniform,Wgyro_BPF, DAQ_time_uniform, BPFed_Wcmd, LineWidth=1.2);
 
 figure(4);
 plot(DAQ_freq_axis, DAQ_fft_positive, 'r');

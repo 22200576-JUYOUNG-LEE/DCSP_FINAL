@@ -24,13 +24,16 @@ void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFile
     double      time_init = 0.0;    //[sec]
     double      time = 0.0;         //[sec]
 
-    double      Disturbance_input   = 0.0; // [???]
-    double      Disturbance_raw     = 0.0; // [???]
+    
     double      Command             = 0.0; //[V]
     double      Vc                  = DAQ_V_STANDARD;// [V]
     double      Vgyro               = 0.0; // [V]
     double      Wgyro               = 0.0; // [rad/sec]  
     double      Angle               = 0.0; // [rad]
+    double      Disturbance_input   = 0.0; // [???]
+    double      Disturbance_raw     = 0.0; // [???]
+
+    double      DOA                 = 0.0;
 
     static double      Out_Time         [N_MAX_BUFFER] = { 0.0, };
     static double      Out_Command      [N_MAX_BUFFER] = { 0.0, };
@@ -39,6 +42,7 @@ void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFile
     static double      Out_Wgyro        [N_MAX_BUFFER] = { 0.0, };
     static double      Out_Disturbance  [N_MAX_BUFFER] = { 0.0, };
     static double      Out_Disturbance_raw  [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_DOA          [N_MAX_BUFFER] = { 0.0, };
 
     DynState s = { time, Command, Wgyro, Angle };
 
@@ -49,7 +53,8 @@ void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFile
         {"\\omega_{gyro}[rad/s]",   Out_Wgyro},
         {"\\theta[rad]",            Out_Angle},
         {"\\omega_{dist}[rad/s]",   Out_Disturbance},
-        {"\\omega_{distRaw}[V]",   Out_Disturbance_raw}
+        {"\\omega_{distRaw}[V]",    Out_Disturbance_raw},
+        {"DOA [??]",                Out_DOA },
     };
     int         numDataset = sizeof(Out_DAQ_Dataset) / sizeof(Out_DAQ_Dataset[0]);
 
@@ -79,11 +84,14 @@ void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFile
         DAQ_Read(Vin);
 
 
-        Disturbance_input   = (Vin[0] - Vgyro_offset) * (V_GYRO2RAD);
-        Disturbance_raw     = Vin[0]                                ;
+        
         Vgyro               = Vin[2]                                ;
         Wgyro               = (Vgyro - Vgyro_offset) * (V_GYRO2RAD);
         Angle               = V_POTEN2RAD(Vin[3]);
+        Disturbance_input   = (Vin[0] - STABILIZATION_GYRO_OFFSET) * (V_GYRO2RAD);
+        Disturbance_raw     = Vin[0];
+
+        DOA                 = Vin[1];
 
         // 4. Save to buffers
         Out_Time            [count] = time;
@@ -93,6 +101,7 @@ void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFile
         Out_Angle           [count] = Angle;
         Out_Disturbance     [count] = Disturbance_input;
         Out_Disturbance_raw [count] = Disturbance_raw;
+        Out_DOA             [count] = DOA;
 
         if (count >= idx_max / 2) {
             count_avg++;

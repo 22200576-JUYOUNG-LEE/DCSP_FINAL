@@ -36,6 +36,7 @@
     (Vpoten * (2.0 * UNIT_PI) / V_POTEN - UNIT_PI)
 #define   V_GYRO2RAD     (double) (1000.0 * UNIT_PI) / (0.67 * 180.0)
 
+
 // RUNNING DEFINE
 #define   RUN_MODE_NONLINEAR    (int) (0)
 #define   RUN_MODE_LINEAR       (int) (1)
@@ -106,7 +107,8 @@
 #define   BODE_SIN_AMPLITUDE    (double)(8.0)
 
 #define   FORMAT_ANGLE_ZERO     (double)(0.0)
-#define   FORMAT_FINAL_TIME     (double)(3.0)
+#define   FORMAT_FINAL_TIME     (double)(2.0)
+#define   FORMAT_FUNC_K         (double)(1.0)
 
 #define   POTEN_INIT	        (double)(-30.0)
 #define   POTEN_STEP	        (double)(3.0)
@@ -122,24 +124,24 @@
 #define   DESIGNATION_TIME_FINAL    (double)(1.0)
 #define   DESIGNATION_TIME_PAUSE    (double)(1.0)
 
-#define   STABILIZATION_DIR        (const char*)("Stabilization")
-#define   STABILIZATION_FILE       (const char*)("Stabil_Dynamics.out")
-#define   STABILIZATION_CONSTANT_P (double)(2.4141)
-#define   STABILIZATION_CONSTANT_I (double)(62.6297)
-#define   STABILIZATION_FINAL_TIME (double)(30.0)
+#define   STABILIZATION_DIR         (const char*)("Stabilization")
+#define   STABILIZATION_FILE        (const char*)("Stabil_Dynamics.out")
+#define   STABILIZATION_CONSTANT_P  (double)(2.4141)
+#define   STABILIZATION_CONSTANT_I  (double)(62.6297)
+#define   STABILIZATION_FINAL_TIME  (double)(30.0)
+#define   STABILIZATION_GYRO_OFFSET (double)(1.47)
 
 typedef enum {
-    MODE_CHECK_DAQ      = 0,
     MODE_STATIC         = 1,
     MODE_VALIDATION     = 2, 
     MODE_BODE           = 3,
-    MODE_POTEN          = 4,
+    MODE_FORMAT         = 4,
     MODE_DESIGNATION    = 5,
     MODE_STABIL         = 6,
 
 
 
-    N_MODE              = 7,
+    N_MODE              = 6,
 } Mode;
 
 extern TaskHandle   taskAI;

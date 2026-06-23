@@ -34,7 +34,7 @@ void Stabilization(void) {
     i_err_prev = 0.0;
     i_out_prev = 0.0;
 
-    //Format(FORMAT_ANGLE_ZERO);
+    Format(FORMAT_ANGLE_ZERO);
 
     DAQ_Pause(DESIGNATION_TIME_PAUSE);
 

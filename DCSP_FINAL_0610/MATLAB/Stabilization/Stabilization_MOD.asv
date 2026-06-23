@@ -5,6 +5,15 @@ clc;
 clear all;
 close all;
 
+
+Tstep   = 0.001;    %[sec] for looking 0.005 [sec] sampling effect
+Tsample = 0.005;    %[sec] 
+Tf      = 10;        %[sec]
+time    = 0:Tstep:Tf;
+
+Freq_sample              = 200.0;                % 샘플링 주파수
+DAQ_freq_axis       = DAQ_Fs * (0:floor(DAQ_length/2)) / DAQ_length;
+
 %==========================================================================
 % Read Dataset
 %==========================================================================
@@ -12,16 +21,36 @@ file = '../../data/Stabilization/Stabil_Dynamics.out';
 Dataset = readmatrix(file, 'NumHeaderLines', 1, 'FileType', 'text');
 
 data_Time          = Dataset(:,1);
+data_Time_length   = length(data_Time);
+data_Time_uniform  = linspace(data_Time(1), data_Time(end), data_Time_length)';
 data_Wgyro         = Dataset(:,4);
-data_disturbance   = Dataset(:,5);
+data_disturbance   = Dataset(:,6);
 
-simin_Wgyro         = [data_Time data_Wgyro];
-simin_disturbance   = [data_Time data_disturbance];
+%==========================================================================
+% BPF
+%==========================================================================
+Wc                              = 0.5*2*pi;
+passBand                        = Wc / 5;
+Wc_range                        = [Wc-passBand; Wc+passBand]; 
+[CT_LPF_NUM, CT_LPF_DEN]        = butter(1, Wc_range, 'band', 's');
+Hs                              = tf(CT_LPF_NUM, CT_LPF_DEN); % CT transfer function
 
-Tstep   = 0.001;    %[sec] for looking 0.005 [sec] sampling effect
-Tsample = 0.005;    %[sec] 
-Tf      = 10;        %[sec]
-time    = 0:Tstep:Tf;
+% digital
+Hz_tustin                       = c2d(Hs, Tsample, 'tustin');
+[DT_tustin_NUM, DT_tustin_DEN]  = tfdata(Hz_tustin, 'v');
+BPFed_Wgyro                     = lsim(Hz_tustin, data_Wgyro, data_Time_uniform);
+BPFed_disturbance               = lsim(Hz_tustin, data_disturbance, data_Time_uniform);
+fft_result                      = fft(BPFed_Wgyro);
+
+DAQ_fft_mag                     = abs(fft_result / data_Time_length);
+DAQ_fft_positive                = DAQ_fft_mag(1:floor(data_Time_length/2)+1, :);
+DAQ_fft_positive(2:end-1, :)    = 2 * DAQ_fft_positive(2:end-1, :);
+
+figure(4);
+plot(DAQ_freq_axis, DAQ_fft_positive, 'r');
+
+simin_Wgyro         = [data_Time_uniform BPFed_Wgyro];
+simin_disturbance   = [data_Time_uniform BPFed_disturbance];
 
 s       = tf('s');
 

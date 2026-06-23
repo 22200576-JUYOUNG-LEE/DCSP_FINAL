@@ -1,6 +1,6 @@
 # include "Header.h"
 
-# define FORMAT_FUNC_K (double)(1.0/2.0)
+
 
 double Format_func(DynState s);
 
@@ -59,8 +59,8 @@ double Format_func(DynState s)
 	velocity = s.Angle - Vp;
 	Vcmd = velocity * FORMAT_FUNC_K;
 
-	if (Vcmd < LIN_V_DEADZONE && Vcmd > -LIN_V_DEADZONE) Vcmd = LIN_V_DEADZONE;
+	if (Vcmd < LIN_V_DEADZONE && Vcmd > -LIN_V_DEADZONE) Vcmd = LIN_V_DEADZONE/10.0;
 
-	if (s.Angle > Vp)  return -Vcmd;
-	else				return -Vcmd;
+	if (s.Angle > Vp)	return -Vcmd;
+	else				return Vcmd;
 }
