@@ -11,6 +11,50 @@ void InitAvg(void) {
     Data_avg.Angle = 0.0;
 }
 
+
+
+/* Tustin LPF */
+
+double b0 = 0.0, b1 = 0.0, a1 = 0.0;
+
+
+double prev_input = 0.0, prev_output = 0.0;
+
+
+double Tustin_LPF(double data, double cutoff_freq) {
+
+    static int is_initialized = 0;
+
+
+    if (is_initialized == 0) {
+        double time_constant = 1.0 / (2.0 * UNIT_PI * cutoff_freq);
+
+        double K = (2.0 * time_constant) / SAMPLING_TIME;
+
+        b0 = b1 = 1.0 / (K + 1.0);
+        a1 = (1.0 - K) / (1.0 + K);
+
+
+        prev_input = data;
+        prev_output = data;
+
+        is_initialized = 1;
+    }
+
+
+    double out = (b0 * data) + (b1 * prev_input) - (a1 * prev_output);
+
+
+    // update
+    prev_input = data;
+    prev_output = out;
+
+    return out;
+}
+
+
+
+
 void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFileName, DynFn fn) {
 
     float64     Vin[NUM_AI_CHANNELS] = { 0.0 };
@@ -26,6 +70,7 @@ void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFile
 
     
     double      Command             = 0.0; //[V]
+    double      Filtered_Command    = 0.0; //[V] 
     double      Vc                  = DAQ_V_STANDARD;// [V]
     double      Vgyro               = 0.0; // [V]
     double      Wgyro               = 0.0; // [rad/sec]  
@@ -35,26 +80,28 @@ void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFile
 
     double      DOA                 = 0.0;
 
-    static double      Out_Time         [N_MAX_BUFFER] = { 0.0, };
-    static double      Out_Command      [N_MAX_BUFFER] = { 0.0, };
-    static double      Out_Vgyro        [N_MAX_BUFFER] = { 0.0, };
-    static double      Out_Angle        [N_MAX_BUFFER] = { 0.0, };
-    static double      Out_Wgyro        [N_MAX_BUFFER] = { 0.0, };
-    static double      Out_Disturbance  [N_MAX_BUFFER] = { 0.0, };
-    static double      Out_Disturbance_raw  [N_MAX_BUFFER] = { 0.0, };
-    static double      Out_DOA          [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Time                  [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Command               [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Filtered_Command      [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Vgyro                 [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Angle                 [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Wgyro                 [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Disturbance           [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_Disturbance_raw       [N_MAX_BUFFER] = { 0.0, };
+    static double      Out_DOA                   [N_MAX_BUFFER] = { 0.0, };
 
     DynState s = { time, Command, Wgyro, Angle };
 
     Dataset     Out_DAQ_Dataset[] = {
-        {"Time[sec]",               Out_Time},
-        {"\\omega_{cmd}[rad/s]",    Out_Command},
-        {"V_{gyro}[V]",             Out_Vgyro},
-        {"\\omega_{gyro}[rad/s]",   Out_Wgyro},
-        {"\\theta[rad]",            Out_Angle},
-        {"\\omega_{dist}[rad/s]",   Out_Disturbance},
-        {"\\omega_{distRaw}[V]",    Out_Disturbance_raw},
-        {"DOA [??]",                Out_DOA },
+        {"Time[sec]",                       Out_Time},
+        {"\\omega_{cmd}[rad/s]",            Out_Command},
+        {"\\Filtered_omega_{cmd}[rad/s]",   Out_Filtered_Command},
+        {"V_{gyro}[V]",                     Out_Vgyro},
+        {"\\omega_{gyro}[rad/s]",           Out_Wgyro},
+        {"\\theta[rad]",                    Out_Angle},
+        {"\\omega_{dist}[rad/s]",           Out_Disturbance},
+        {"\\omega_{distRaw}[V]",            Out_Disturbance_raw},
+        {"DOA [??]",                        Out_DOA },
     };
     int         numDataset = sizeof(Out_DAQ_Dataset) / sizeof(Out_DAQ_Dataset[0]);
 
@@ -76,8 +123,14 @@ void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFile
         // 2. Processing
         if (fn != NULL) Command = fn(s);
 
-        if (RUN_DAQ_mode == RUN_MODE_LINEAR) Vc = Linearization(Command);
-        else Vc = Command;
+        
+        // 2-2. Filtering: 
+        Filtered_Command = Tustin_LPF(Command, 20.0);
+
+
+
+        if (RUN_DAQ_mode == RUN_MODE_LINEAR) Vc = Linearization(Filtered_Command);
+        else Vc = Filtered_Command;
 
         // 3. Write and Read
         DAQ_Write(Vc);
@@ -94,14 +147,15 @@ void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFile
         DOA                 = Vin[1];
 
         // 4. Save to buffers
-        Out_Time            [count] = time;
-        Out_Command         [count] = Command;
-        Out_Vgyro           [count] = Vin[2];
-        Out_Wgyro           [count] = Wgyro;
-        Out_Angle           [count] = Angle;
-        Out_Disturbance     [count] = Disturbance_input;
-        Out_Disturbance_raw [count] = Disturbance_raw;
-        Out_DOA             [count] = DOA;
+        Out_Time                    [count] = time;
+        Out_Command                 [count] = Command;
+        Out_Filtered_Command        [count] = Filtered_Command;
+        Out_Vgyro                   [count] = Vin[2];
+        Out_Wgyro                   [count] = Wgyro;
+        Out_Angle                   [count] = Angle;
+        Out_Disturbance             [count] = Disturbance_input;
+        Out_Disturbance_raw         [count] = Disturbance_raw;
+        Out_DOA                     [count] = DOA;
 
         if (count >= idx_max / 2) {
             count_avg++;

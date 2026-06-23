@@ -1,6 +1,7 @@
 function Trans_func_valid(path)
 %% Motor Validation with Quantitative Error Metrics
 
+
 [sys_final, g_initial] = Trans_func(path);
 
 % --- Storage for summary table ---
@@ -10,7 +11,7 @@ nrmse_list  = [];
 amp_ratio_list  = [];
 phase_err_list  = [];
 
-for f_val = 0.2:0.2:2.0
+for f_val = 0.3:1.0
     validation_fn = sprintf('%sBodeMag_sin_freq%.2f.out', path, f_val);
     if ~isfile(validation_fn), continue; end
 

@@ -9,7 +9,7 @@ g_initial = g_exp(1);
 
 %% 2. Define Fit Range
 f_min = 0.3;
-f_max = 1.0;
+f_max = 0.6;
 idx = find(f_exp >= f_min & f_exp <= f_max);
 w   = 2 * pi * f_exp(idx);
 p_rad = p_exp(idx) * pi / 180;

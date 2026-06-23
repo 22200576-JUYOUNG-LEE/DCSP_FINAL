@@ -226,4 +226,7 @@ double Designation_Control(DynState s);
 void Stabilization(void);
 void Stabilization_Control(DynState s);
 
+//10. LPF:
+double Tustin_LPF(double data, double cutoff_freq);
+
 #endif
