@@ -1,5 +1,6 @@
-function  [Freq, FFT_Mag]= FFT_1D(Time, X, Freq_sampling)
+function  [Freq, FFT_Mag]= FFT_1D(Time, X)
 
+    Freq_sampling       = 200.0;
     time_length         = length(Time);
     Freq                = Freq_sampling * (0:floor(time_length/2)) / time_length;
 

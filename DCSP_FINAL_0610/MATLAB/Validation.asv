@@ -18,24 +18,18 @@ Wgyro_tri      = Tri_data(:,4).*scaler_rad2deg;
 filename        = sprintf('%sValid_%s.out', base_dir, 'sin');
 Sin_data        = readmatrix(filename, 'NumHeaderLines', 1, 'FileType', 'text');
 
-Time_sin        = Sin_data(:, 1);
-Wcmd_sin        = Sin_data(:, 2).*scaler_rad2deg;
-Wgyro_sin       = Sin_data(:, 4).*scaler_rad2deg;
+Time(:,2)       = Sin_data(:, 1);
+Wcmd(:,2)       = Sin_data(:, 2).*scaler_rad2deg;
+Wgyro(:,2)      = Sin_data(:, 4).*scaler_rad2deg;
 
 % -------------------------------------------------------------------------
 % 2. Data Processing
 % -------------------------------------------------------------------------
-[fft_freq_tri, fft_Wcmd_tri]        = FFT_1D(Time_tri, Wcmd_tri);
-[~,            fft_Wgyro_tri]       = FFT_1D(Time_tri, Wgyro_tri);
+[fft_freq_tri, fft_Wcmd_tri]        = FFT_1D(Time(1), Wcmd(1));
+[~,            fft_Wgyro_tri]       = FFT_1D(Time(1), Wgyro(1));
 
-[fft_freq_sin, fft_Wcmd_sin]        = FFT_1D(Time_sin, Wcmd_sin);
-[~,            fft_Wgyro_sin]       = FFT_1D(Time_sin, Wgyro_sin);
-
-figure(1); hold on;
-plot(fft_freq_tri, fft_Wcmd_tri, 'r', 'LineWidth', 1.2);
-plot(fft_freq_tri, fft_Wgyro_tri, 'b', 'LineWidth', 1.2);
-hold off; grid on;
-
+[fft_freq_sin, fft_Wcmd_sin]        = FFT_1D(Time(2), Wcmd(2));
+[~,            fft_Wgyro_sin]       = FFT_1D(Time(2), Wgyro(2));
 
 % % 2-2. Movemean
 % window_size = 10;

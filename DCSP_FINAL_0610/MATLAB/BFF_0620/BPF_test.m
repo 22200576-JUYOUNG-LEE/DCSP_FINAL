@@ -3,6 +3,7 @@
 % author: Juyoung Lee
 
 % clear; clc; close all;
+addpath('..\lib_function\');
 
 fileName = 'Stabil_Dynamics.out';
 DAQ_data_values = readmatrix(fileName, 'NumHeaderLines', 1, 'FileType', 'text');
@@ -20,15 +21,15 @@ DAQ_length          = length(DAQ_time);
 DAQ_dt              = DAQ_time(2) - DAQ_time(1); % 샘플링 주기
 DAQ_time_uniform    = linspace(DAQ_time(1), DAQ_time(end), DAQ_length)';
 DAQ_Wgyro_data      = DAQ_data_values(:, 4);
-DAQ_Wb_data         = DAQ_data_values(:, )
+DAQ_Wb_data         = DAQ_data_values(:, 6);
 
 fft_sampling        = 1000;                % 샘플링 주파수
 
 [DAQ_freq_axis, DAQ_fft_positive] = FFT_1D(DAQ_time_uniform, DAQ_Wgyro_data,fft_sampling);
 
-figure(5); hold on;
-plot(DAQ_time_uniform, DAQ_Wgyro_data, 'b');
-title(fileName);
+% figure(5); hold on;
+% plot(DAQ_time_uniform, DAQ_Wgyro_data, 'b');
+% title(fileName);
 
 figure(2);
 plot(DAQ_freq_axis, DAQ_fft_positive, 'r');
@@ -40,19 +41,18 @@ title(fileName);
 % analoge
 Wc                              = 0.5*2*pi;
 
-Wgyro_BPF                       = BPF_1D(Time_uniform, DAQ_Wgyro_data, Wc/5);
-Wgyro_BPF                       = BPF_1D(Time_uniform, DAQ_)
+Wgyro_BPF                       = BPF_1D(DAQ_time_uniform, DAQ_Wgyro_data, Wc, Wc/5);
+Wgyro_LPF                       = LPF_1D(DAQ_time_uniform, DAQ_Wgyro_data, Wc);
+Wb_BPF                          = BPF_1D(DAQ_time_uniform, DAQ_Wb_data, Wc, Wc/5);
 
-DAQ_fft_result                  = fft(Wgyro_BPF); % 한 번에 FFT 가능
+[DAQ_freq_axis, fft_Wgyro_BPF ] = FFT_1D(DAQ_time_uniform, Wgyro_BPF,fft_sampling);
+[~, fft_Wgyro_LPF]              = FFT_1D(DAQ_time_uniform, Wgyro_LPF,fft_sampling);
 
-% 4. FFT 크기(Magnitude) 변환 및 단방향(Positive) 절단
-DAQ_fft_mag                     = abs(DAQ_fft_result / DAQ_length);
-DAQ_fft_positive                = DAQ_fft_mag(1:floor(DAQ_length/2)+1, :);
-DAQ_fft_positive(2:end-1, :)    = 2 * DAQ_fft_positive(2:end-1, :); % DC 성분 제외 2배 보정
+[~, fft_Wb_BPF]                 = FFT_1D(DAQ_time_uniform, Wb_BPF,fft_sampling);
 
+% BPF is more proper than LPF
 figure(5); 
-plot(DAQ_time_uniform,Wgyro_BPF, DAQ_time_uniform, BPFed_Wcmd, LineWidth=1.2);
+plot(DAQ_time_uniform,Wgyro_BPF, 'r',DAQ_time_uniform, Wgyro_LPF, 'b',LineWidth=1.2);
 
-figure(4);
-plot(DAQ_freq_axis, DAQ_fft_positive, 'r');
-title(fileName);
+figure(6);
+plot(DAQ_freq_axis, fft_Wgyro_BPF, 'r', DAQ_freq_axis, fft_Wgyro_LPF, 'b');
