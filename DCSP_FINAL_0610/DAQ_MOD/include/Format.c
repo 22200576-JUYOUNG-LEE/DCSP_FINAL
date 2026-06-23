@@ -4,7 +4,7 @@
 
 double Format_func(DynState s);
 
-double Vp = 0.0;
+double target_angle = 0.0;
 
 void Potentio() {
 	double		Angle = POTEN_INIT;
@@ -45,22 +45,20 @@ void Potentio() {
 
 void Format(double Angle) {
 
-	Vp = POTEN_INIT_V + Angle * POTEN_DEG2V_POTEN;
-	RUN_DAQ_mode = RUN_MODE_LINEAR;
+	target_angle		= Angle * SCALE_DEG2RAD;
+	RUN_DAQ_mode		= RUN_MODE_LINEAR;
 	MotorDynamic(FORMAT_FINAL_TIME, POTEN_DATA_DIR, POTEN_FILE, Format_func);
 }
 
 
 double Format_func(DynState s)
 {
-	double velocity = 0.0;
-	double Vcmd = 0.0;
+	double command = 0.0;
 
-	velocity = s.Angle - Vp;
-	Vcmd = velocity * FORMAT_FUNC_K;
+	command = (s.Angle - target_angle) * FORMAT_FUNC_K;
 
-	if (Vcmd < LIN_V_DEADZONE && Vcmd > -LIN_V_DEADZONE) Vcmd = LIN_V_DEADZONE/10.0;
+	if (command < LIN_V_DEADZONE && command > -LIN_V_DEADZONE) command = LIN_V_DEADZONE/5.0;
 
-	if (s.Angle > Vp)	return -Vcmd;
-	else				return Vcmd;
+	if (s.Angle > target_angle)	return -command;
+	else						return command;
 }

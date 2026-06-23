@@ -15,7 +15,7 @@ void InitAvg(void) {
 
 /* Tustin LPF */
 
-double b0 = 0.0, b1 = 0.0, a1 = 0.0;
+double LPF_b0 = 0.0, LPF_b1 = 0.0, LPF_a1 = 0.0;
 
 
 double prev_input = 0.0, prev_output = 0.0;
@@ -23,16 +23,16 @@ double prev_input = 0.0, prev_output = 0.0;
 
 double Tustin_LPF(double data, double cutoff_freq) {
 
-    static int is_initialized = 0;
-
+    static int is_initialized   = 0;
+    double out                  = 0.0;
 
     if (is_initialized == 0) {
         double time_constant = 1.0 / (2.0 * UNIT_PI * cutoff_freq);
 
         double K = (2.0 * time_constant) / SAMPLING_TIME;
 
-        b0 = b1 = 1.0 / (K + 1.0);
-        a1 = (1.0 - K) / (1.0 + K);
+        LPF_b0 = LPF_b1 = 1.0 / (K + 1.0);
+        LPF_a1 = (1.0 - K) / (1.0 + K);
 
 
         prev_input = data;
@@ -42,7 +42,7 @@ double Tustin_LPF(double data, double cutoff_freq) {
     }
 
 
-    double out = (b0 * data) + (b1 * prev_input) - (a1 * prev_output);
+    out = (LPF_b0 * data) + (LPF_b1 * prev_input) - (LPF_a1 * prev_output);
 
 
     // update
@@ -125,7 +125,7 @@ void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFile
 
         
         // 2-2. Filtering: 
-        Filtered_Command = Tustin_LPF(Command, 20.0);
+        Filtered_Command = Tustin_LPF(Command, TUSTIN_LPF_FREQ_CUTOFF);
 
 
 
@@ -155,6 +155,7 @@ void MotorDynamic(double Final_time, const char* OutDirName, const char* OutFile
         Out_Angle                   [count] = Angle;
         Out_Disturbance             [count] = Disturbance_input;
         Out_Disturbance_raw         [count] = Disturbance_raw;
+
         Out_DOA                     [count] = DOA;
 
         if (count >= idx_max / 2) {

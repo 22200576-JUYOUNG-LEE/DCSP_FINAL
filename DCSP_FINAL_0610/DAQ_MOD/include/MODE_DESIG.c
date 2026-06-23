@@ -1,38 +1,41 @@
 #include "Header.h"
 
-void Designation(void) {
+double      target_angle_rad    = 0.0;
+double      target_rate_rad     = 0.0;
+
+double      current_rad         = 0.0;
+double      current_rate_rad    = 0.0;
+
+double      error               = 0.0;
+double      d_error             = 0.0;
+
+double      Command             = 0.0;
+
+void Designation(double target_angle) {
     printf("\n================================\n");
     printf("\tDESIGNATION LOOP (PD Control + LIN)");
     printf("\n================================\n");
 
+    
     Format(FORMAT_ANGLE_ZERO);
     DAQ_Pause(DESIGNATION_TIME_PAUSE);
     
-    RUN_DAQ_mode = RUN_MODE_LINEAR;
+    RUN_DAQ_mode        = RUN_MODE_LINEAR;
 
-    MotorDynamic(DESIGNATION_TIME_FINAL, "Designation_data", "Designation_Step.out", Designation_Control);
+    target_angle_rad    = target_angle * SCALE_DEG2RAD;
+
+    MotorDynamic(DESIGNATION_TIME_FINAL, "Designation", "Designation_Step.out", Designation_Control);
 }
 
 double Designation_Control(DynState s) {
-    // 1. Modify here
-    double Kp = 0.066389;
-    double Kd = 0.002361;
+    current_rad         = s.Angle;
+    current_rate_rad    = s.Wgyro;
 
-    double target_deg = 80.0;
+    error               = target_angle_rad - current_rad;
+    d_error             = 0.0 - current_rate_rad;
 
-    // 2. sensor data [deg], [deg/s]
-    double current_deg = s.Angle;
-    double current_rate_deg = s.Wgyro;
+    Command = (DESIGNATION_K_P * error) + (DESIGNATION_K_D * d_error);
 
-    // 3. error calculation ()
-    double error = target_deg - current_deg;
-    double d_error = 0.0 - current_rate_deg;
-
-    // 4. 
-    double control_effort = (Kp * error) + (Kd * d_error);
-
-
-    // Vcmd return 
-    return control_effort;
+    return Command;
 }
 

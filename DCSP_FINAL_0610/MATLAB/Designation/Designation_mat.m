@@ -1,9 +1,12 @@
 % subject: Digital control and signal Processing
 % title: Designation
+clc; clear all; close all;
 
-clc;
-clear all;
-close all;
+%==========================================================================
+% Read Dataset
+%==========================================================================
+addpath("lib_function\");
+scaler_rad2deg   = 180.0/pi ; 
 
 Tstep           = 0.001;    %[sec] for looking 0.005 [sec] sampling effect
 Tsample         = 0.005;    %[sec] 
@@ -14,8 +17,8 @@ target_angle    = 80.0;
 %==========================================================================
 % Read Dataset
 %==========================================================================
-filename    = '..\..\Data\Designation_data\Designation_Step_80.out'; 
-Dataset        = readmatrix(filename, 'FileType', 'text', 'NumHeaderLines', 1);
+filename        = '..\..\Data\Designation_data\Designation_Step_80.out'; 
+Dataset         = readmatrix(filename, 'FileType', 'text', 'NumHeaderLines', 1);
 
 data_Time_raw        = data(1:end, 1);
 data_time_length     = length(data_Time_raw);

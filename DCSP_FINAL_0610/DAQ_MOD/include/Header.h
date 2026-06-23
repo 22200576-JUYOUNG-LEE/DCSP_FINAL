@@ -28,6 +28,7 @@
 #define   DAQ_V_STANDARD   (double) (2.5)
 
 #define   SCALE_RAD2DEG   (double) (180.0 / UNIT_PI)
+#define   SCALE_DEG2RAD   (double) (UNIT_PI/180.0)
 #define   V_POTEN         (double) (5.0)
 
 #define   CAL_AVG(num_data, Ybar_pre, Y) \
@@ -123,6 +124,9 @@
 
 #define   DESIGNATION_TIME_FINAL    (double)(1.0)
 #define   DESIGNATION_TIME_PAUSE    (double)(1.0)
+#define   DESIGNATION_TARGET_ANGLE  (double)(30.0)
+#define   DESIGNATION_K_D           (double)(2.2684)
+#define   DESIGNATION_K_P           (double)(66.0622)
 
 #define   STABILIZATION_DIR         (const char*)("Stabilization")
 #define   STABILIZATION_FILE        (const char*)("Stabil_Dynamics.out")
@@ -130,6 +134,8 @@
 #define   STABILIZATION_CONSTANT_I  (double)(62.6297)
 #define   STABILIZATION_FINAL_TIME  (double)(30.0)
 #define   STABILIZATION_GYRO_OFFSET (double)(1.47)
+
+#define   TUSTIN_LPF_FREQ_CUTOFF    (double)(20.0)
 
 typedef enum {
     MODE_STATIC         = 1,
@@ -153,6 +159,17 @@ extern double       Vgyro_offset;
 
 extern char         OutDirName[N_NAME_BUFFER];
 extern char         OutFileName[N_NAME_BUFFER];
+
+extern double       target_angle_rad;
+extern double       target_rate_rad;
+
+extern double       current_rad;
+extern double       current_rate_rad;
+
+extern double       error;
+extern double       d_error;
+
+extern double       Command;
 
 typedef struct {
     const char* name;
@@ -219,7 +236,7 @@ void Format(double Angle);
 
 
 //8. Designaiton.c
-void   Designation(void);
+void Designation(double target_angle);
 double Designation_Control(DynState s);
 
 //9. MODE_STABIL.C

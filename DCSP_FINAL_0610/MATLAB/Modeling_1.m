@@ -57,7 +57,7 @@ for idx = 1:length(search_freqs)
     xlabel('Time[sec]','FontWeight','bold');
     ylabel('\omega_{cmd BPF}[rad/sec] vs \omega_{gyro BPF}[rad/sec]','FontWeight','bold');
 
-    title(f);
+    title(freq);
     legend('\omega_{cmd BPF}[rad/sec]', '\omega_{gyro BPF}[rad/sec]');
     hold off; grid on;
 

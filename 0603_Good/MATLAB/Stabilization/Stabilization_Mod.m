@@ -57,7 +57,7 @@ W_cl        = 26;         % [rad/s]
     
 % 2. tf of Gc
 Kp          = (2*W_cl*Zeta_cl*Time_const - 1)/Km; % [-]
-Ki          = (Time_const/Km)*W_cl^2;             % [V/rad] 
+Ki          = (Time_const/Km)*W_cl^2            ; % [V/rad] 
 Gc          = Kp+Ki/s;
 
 Go          = Gc*Gm;

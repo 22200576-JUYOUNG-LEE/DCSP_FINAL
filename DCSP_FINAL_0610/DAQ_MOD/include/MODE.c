@@ -27,12 +27,12 @@ void RunMode(void)
 {
 
     switch (SelectOperatingMode()) {
-    case MODE_STATIC:        IterStaticProperty();      break;
-    case MODE_VALIDATION:    StaticValidation();        break;
-    case MODE_BODE:          BodeMag();                 break;
-    case MODE_FORMAT:        Format(0.0);               break;
-    case MODE_DESIGNATION:   Designation();             break;
-    case MODE_STABIL:        Stabilization();           break;
+    case MODE_STATIC:        IterStaticProperty();                  break;
+    case MODE_VALIDATION:    StaticValidation();                    break;
+    case MODE_BODE:          BodeMag();                             break;
+    case MODE_FORMAT:        Format(FORMAT_ANGLE_ZERO);             break;
+    case MODE_DESIGNATION:   Designation(DESIGNATION_TARGET_ANGLE); break;
+    case MODE_STABIL:        Stabilization();                       break;
 
 
 

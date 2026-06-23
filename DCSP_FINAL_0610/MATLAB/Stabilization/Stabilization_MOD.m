@@ -8,7 +8,7 @@ close all;
 
 Tstep   = 0.001;    %[sec] for looking 0.005 [sec] sampling effect
 Tsample = 0.005;    %[sec] 
-Tf      = 10;        %[sec]
+Tf      = 30;        %[sec]
 time    = 0:Tstep:Tf;
 
 
@@ -16,14 +16,14 @@ time    = 0:Tstep:Tf;
 %==========================================================================
 % Read Dataset
 %==========================================================================
-file = '../../data/Stabilization/Stabil_Dynamics.out';
+file = '../../data/Stabilization/Stabil_Dynamics_first.out';
 Dataset = readmatrix(file, 'NumHeaderLines', 1, 'FileType', 'text');
 
 data_Time          = Dataset(:,1);
 data_Time_length   = length(data_Time);
 data_Time_uniform  = linspace(data_Time(1), data_Time(end), data_Time_length)';
-data_Wgyro         = Dataset(:,4);
-data_disturbance   = Dataset(:,6);
+data_Wgyro         = Dataset(:,5);
+data_disturbance   = Dataset(:,7);
 
 Freq_sample        = 200.0;                % 샘플링 주파수
 Freq_axis          = Freq_sample * (0:floor(data_Time_length/2)) / data_Time_length;

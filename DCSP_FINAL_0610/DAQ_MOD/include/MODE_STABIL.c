@@ -44,17 +44,17 @@ void Stabilization(void) {
 }
         
 void Stabilization_Control(DynState s) {
-    double error            = 0.0;
+    error               = 0.0;
 
-    double current_rate_deg = 0.0;
-    double target_rate_deg  = 0.0;
+    current_rate_rad    = 0.0;
+    current_rad         = 0.0;
 
-    double Command = 0.0;
+    Command             = 0.0;
 
-    current_rate_deg = s.Wgyro;
-    error = target_rate_deg - current_rate_deg;
+    current_rate_rad    = s.Wgyro;
+    error               = target_rate_rad - current_rate_rad;
 
-    Command = P_controller(error, STABILIZATION_CONSTANT_P) + I_controller(error, STABILIZATION_CONSTANT_I);
+    Command             = P_controller(error, STABILIZATION_CONSTANT_P) + I_controller(error, STABILIZATION_CONSTANT_I);
 
     return  Command;
 }
