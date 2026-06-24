@@ -82,7 +82,8 @@
 #define   VALID_ITER_MAX        (int) (1)
 
 #define   PULSE_FINAL_TIME                  (double)(27.0)
-#define   PULSE_DESIRED_RATE_ANGLE_RAD_S    (double)(10.0)
+#define   PULSE_DESIRED_RATE_ANGLE_RAD_S    (double)(40.0)
+#define   PULSE_TIME_PERIOD                 (double)(3.0)
 
 #define   VALID_TRI_AMPLITUDE   (double)(24.0)
 #define   VALID_TRI_TIME_PAUSE  (double) (2.0)
