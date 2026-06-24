@@ -81,6 +81,9 @@
 #define   VALID_DIR             (const char*)("Validation")
 #define   VALID_ITER_MAX        (int) (1)
 
+#define   PULSE_FINAL_TIME                  (double)(27.0)
+#define   PULSE_DESIRED_RATE_ANGLE_RAD_S    (double)(10.0)
+
 #define   VALID_TRI_AMPLITUDE   (double)(24.0)
 #define   VALID_TRI_TIME_PAUSE  (double) (2.0)
 #define   VALID_TRI_TIME_PERIOD (double)(30.0)
@@ -139,15 +142,17 @@
 
 typedef enum {
     MODE_STATIC         = 1,
-    MODE_VALIDATION     = 2, 
-    MODE_BODE           = 3,
-    MODE_FORMAT         = 4,
-    MODE_DESIGNATION    = 5,
-    MODE_STABIL         = 6,
+    MODE_PULSE          = 2,
+    MODE_VALIDATION     = 3, 
+    MODE_BODE           = 4,
+    MODE_FORMAT         = 5,
+    MODE_DESIGNATION    = 6,
+    MODE_STABIL         = 7,
+    
 
 
 
-    N_MODE              = 6,
+    N_MODE              = 7,
 } Mode;
 
 extern TaskHandle   taskAI;
@@ -226,6 +231,9 @@ void StaticValidation();
 
 double Linearization(double vin);
 void ReadLinearCoefficent(void);
+
+// MODE_PULSE
+void Pulse(void);
 
 // 6. myBode.c
 void BodeMag();

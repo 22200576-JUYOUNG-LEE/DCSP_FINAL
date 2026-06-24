@@ -51,6 +51,9 @@
     <ClCompile Include="include\MODE_DAQ_CHECK.c">
       <Filter>헤더 파일</Filter>
     </ClCompile>
+    <ClCompile Include="include\MODE_PULSE.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Header.h">

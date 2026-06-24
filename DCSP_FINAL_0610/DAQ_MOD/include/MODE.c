@@ -2,6 +2,7 @@
 
 static const char* MODE_LABELS[N_MODE] = {
     "Obtain Motor Static Property",
+    "Pulse Validation",
     "Motor Validation",
     "Bode Mag",
     "Format",
@@ -28,6 +29,7 @@ void RunMode(void)
 
     switch (SelectOperatingMode()) {
     case MODE_STATIC:        IterStaticProperty();                  break;
+    case MODE_PULSE:         Pulse();                               break;
     case MODE_VALIDATION:    StaticValidation();                    break;
     case MODE_BODE:          BodeMag();                             break;
     case MODE_FORMAT:        Format(FORMAT_ANGLE_ZERO);             break;

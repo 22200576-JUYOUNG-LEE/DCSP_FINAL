@@ -26,6 +26,7 @@
     <ClCompile Include="include\Linearization.c" />
     <ClCompile Include="include\MODE.c" />
     <ClCompile Include="include\Format.c" />
+    <ClCompile Include="include\MODE_PULSE.c" />
     <ClCompile Include="include\MODE_STABIL.c" />
     <ClCompile Include="include\MotorDynamic.c" />
     <ClCompile Include="include\MODE_STATIC.c" />

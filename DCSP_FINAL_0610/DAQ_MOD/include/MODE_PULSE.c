@@ -2,10 +2,10 @@
 
 
 
-double Pulse(DynState s); 
+double Pulse_signal(DynState s); 
 
 
-void Valid_Pulse(void) {
+void Pulse(void) {
 
 	InitPath();
 	
@@ -22,22 +22,19 @@ void Valid_Pulse(void) {
 
 }
 
-double Pulse(DynState s) {
-	
-	double tick = 0.0;
-
-	double desired_rate_angle_2_rate_rad = 0.0;
+double Pulse_signal(DynState s) {
 
 
 	tick = 3.0; // [sec]
-	
-	desired_rate_angle_2_rate_rad=PULSE_DESIRED_RATE_ANGLE* (UNIT_PI) / (180.0); // [rad/sec]
 
-
-	if		(s.Time <= tick)		return desired_rate_angle_2_rate_rad;
+	if		(s.Time <= tick)		return PULSE_DESIRED_RATE_ANGLE_RAD_S;
 	else if (s.Time <= tick * 2)	return 0.0;
-	else if (s.Time <= tick * 3)	return -desired_rate_angle_2_rate_rad;
+	else if (s.Time <= tick * 3)	return -PULSE_DESIRED_RATE_ANGLE_RAD_S;
 	else if (s.Time <= tick * 4)	return 0.0;
-	else if (s.Time <= tick * 5)	return desired_rate_angle_2_rate_rad;
+	else if (s.Time <= tick * 5)	return PULSE_DESIRED_RATE_ANGLE_RAD_S;
+	else if (s.Time <= tick * 6)	return 0.0;
+	else if (s.Time <= tick * 7)	return -PULSE_DESIRED_RATE_ANGLE_RAD_S;
+	else if (s.Time <= tick * 8)	return 0.0;
+	else if (s.Time <= tick * 9)	return PULSE_DESIRED_RATE_ANGLE_RAD_S;
 
 }

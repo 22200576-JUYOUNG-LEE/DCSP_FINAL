@@ -11,12 +11,12 @@ Tsample = 0.005;    %[sec]
 Tf      = 30;        %[sec]
 time    = 0:Tstep:Tf;
 
-
+addpath('..\lib_function\');
 
 %==========================================================================
 % Read Dataset
 %==========================================================================
-file = '../../data/Stabilization/Stabil_Dynamics_first.out';
+file = '../../data/Stabilization/Stabil_Dynamics.out';
 Dataset = readmatrix(file, 'NumHeaderLines', 1, 'FileType', 'text');
 
 data_Time          = Dataset(:,1);
@@ -24,6 +24,7 @@ data_Time_length   = length(data_Time);
 data_Time_uniform  = linspace(data_Time(1), data_Time(end), data_Time_length)';
 data_Wgyro         = Dataset(:,5);
 data_disturbance   = Dataset(:,7);
+LPF_Wgyro          = LPF_1D(data_Time_uniform, data_Wgyro, 30);
 
 Freq_sample        = 200.0;                % 샘플링 주파수
 Freq_axis          = Freq_sample * (0:floor(data_Time_length/2)) / data_Time_length;
@@ -51,8 +52,8 @@ DAQ_fft_positive(2:end-1, :)    = 2 * DAQ_fft_positive(2:end-1, :);
 figure(4);
 plot(Freq_axis, DAQ_fft_positive, 'r');
 
-simin_Wgyro         = [data_Time_uniform BPFed_Wgyro];
-simin_disturbance   = [data_Time_uniform BPFed_disturbance];
+simin_Wgyro         = [data_Time_uniform LPF_Wgyro];
+simin_disturbance   = [data_Time_uniform data_disturbance];
 
 s       = tf('s');
 

@@ -38,7 +38,9 @@ void Stabilization(void) {
 
     DAQ_Pause(DESIGNATION_TIME_PAUSE);
 
-    RUN_DAQ_mode = RUN_MODE_LINEAR;
+    RUN_DAQ_mode    = RUN_MODE_LINEAR;
+
+    target_rate_rad = 5.0; 
 
     MotorDynamic(STABILIZATION_FINAL_TIME, STABILIZATION_DIR, STABILIZATION_FILE, Stabilization_Control);
 }

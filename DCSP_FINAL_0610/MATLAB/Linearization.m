@@ -53,11 +53,11 @@ CoefN = polyfit(Wg(idxN1:idxN2), Vm(idxN1:idxN2), 4);
 %-------------------------------------------------------------------------- 
 % Validity Check of Linearization Algorithm  
 %-------------------------------------------------------------------------- 
-bufWc = -1200:1:1200 ; % control command of a stabilization loop   
+bufWc = -1300:1:1300 ; % control command of a stabilization loop   
 N = length(bufWc) ;  
 
-Wc_DZ  = 50.0 ; % desired dead-zone  [deg/s]  
-Wc_SAT = 1300.0 ; % desired saturation [deg/s]   
+Wc_DZ  = 50.0 ;     % desired dead-zone  [deg/s]  
+Wc_SAT = 1000.0 ;   % desired saturation [deg/s]   
 
 for idx = 1 : N
     Wc = bufWc(idx) ; % control command  

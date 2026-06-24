@@ -2,29 +2,33 @@
 % title: Designation
 clc; clear all; close all;
 
-
-
 %==========================================================================
 % init
 %==========================================================================
 addpath(".\lib_function\");
-scaler_rad2deg      = 180.0/pi ; 
 s                   = tf('s');
-target_angle        = 80.0;  %[deg]
+
+target_angle        = 30.0;  %[deg]
+scaler_rad2deg      = 180.0/pi ; 
+scaler_deg2rad      = pi/180.0 ; 
 
 %==========================================================================
 % Read Dataset
 %==========================================================================
-filename        = '..\data\Designation\Designation_Step_80.out'; 
-Desig_data         = readmatrix(filename, 'FileType', 'text', 'NumHeaderLines', 1);
+filename                = '..\data\Designation\Designation_Step_30.out'; 
+Desig_data              = readmatrix(filename, 'FileType', 'text', 'NumHeaderLines', 1);
 
-Time_raw        = Desig_data(:, 1);
-time_length     = length(Time_raw);
-time_uniform    = linspace(Time_raw(1), Time_raw(end),)
+Time_raw                = Desig_data(:, 1);
+time_length             = length(Time_raw);
+time_uniform            = linspace(Time_raw(1), Time_raw(end),time_length);
 
-Angle_deg       = Desig_data(:, 4);     % [deg]
-Wgyro_deg_sec   = Desig_data(:, 5);     % [deg]
-Step_sig        = target_angle .* ones(time_length,1);   % [deg]
+sampling_period         = Time_raw(2) - Time_raw(1);
+
+Angle_deg               = Desig_data(:, 6) * scaler_rad2deg;     % [deg]
+Wgyro_deg_sec           = Desig_data(:, 5) * scaler_rad2deg;     % [deg/s]
+Filtered_omega          = Desig_data(:, 3) * scaler_rad2deg;     % [deg/s]
+norm_Filtered_omega     = normalize(Filtered_omega, 'range', [-30 30]);
+Step_sig                = target_angle .* ones(time_length,1);   % [rad]
 
 
 %==========================================================================
@@ -33,7 +37,6 @@ Step_sig        = target_angle .* ones(time_length,1);   % [deg]
 Km          = 11.8676/ 12.6778     ;   % [rad/(sec*V)]
 Time_const  = 1 / 12.6778            ;   % [sec]
 Gm          = Km / (Time_const*s + 1); % Motor bandwidth 2.7723 [Hz]
-
 
 %==========================================================================
 % W_cl iteration for getting insight
@@ -45,9 +48,11 @@ W_cl_step   = 3.0;
 figure(1); hold on;
 figure(2); hold on;
 figure(3); hold on;
-for iter = 1:1:5
+figure(4); hold on;
+for iter = 1:1:1
 
-    W_cl        = 18 + iter * W_cl_step;         % [rad/s]
+    % W_cl        = 18 + iter * W_cl_step;         % [rad/s]
+    W_cl        = 28 ;
 
     % 2. tf of Gc
     Kd          = (2*W_cl*Zeta_cl*Time_const - 1)/Km; % [-]
@@ -62,7 +67,7 @@ for iter = 1:1:5
     Time_90         = 2.6546 / W_cl;  % [sec] 
 
     % 5. %OS
-    OS              = exp(-(Zeta_cl/sqrt(1-Zeta_cl))*pi) * 100.0;
+    OS              = exp(-(Zeta_cl/sqrt(1-Zeta_cl^2))*pi) * 100.0;
 
     % 5. Margin
     [GM, PM, ~, ~]  = margin(Go);
@@ -73,7 +78,7 @@ for iter = 1:1:5
     % Plot
     %======================================================================
     spec_label      = sprintf(['\\omega_{cl}: %.0f [rad/s], t_{90}: %.2f [sec], ' ...
-        'GM: %.2f dB, PM: %.2f^\\circ'], W_cl, Time_90, GM_dB, PM);
+        '%%OS: %.2f%%, GM: %.2f dB, PM: %.2f^\\circ'], W_cl, Time_90, OS, GM_dB, PM);
 
     % pz map
     figure(1); 
@@ -92,9 +97,11 @@ for iter = 1:1:5
     bode(Go);
 
     % % time
-    % figure(4);
-    % Hz_tustin      = c2d(Hs, sampling_period, 'tustin');
-    = lsim(Hz_tustin, X, time_uniform);
+    figure(4);
+    Gcl_tustin      = c2d(Gcl, sampling_period, 'tustin');
+    step_response   = lsim(Gcl_tustin, Step_sig, time_uniform);
+    plot(time_uniform, step_response, LineWidth=1.2, DisplayName=spec_label);
+
 
 end
 figure(1); legend('Interpreter', 'tex', 'Location', 'best');
@@ -110,25 +117,26 @@ grid on; hold off;
 figure(3); legend('Interpreter', 'tex', 'Location', 'southwest'); 
 grid on; hold off;
 
+figure(4); legend('Interpreter', 'tex', 'Location', 'southwest'); 
+grid on; hold off;
+
 
 %==========================================================================
 % Simin Values
 %==========================================================================
-Tstep           = 0.001;    %[sec] for looking 0.005 [sec] sampling effect
+Tstep           = 0.0001;    %[sec] for looking 0.005 [sec] sampling effect
 Tsample         = 0.005;    %[sec] 
 Tf              = 10;        %[sec]
 time            = 0:Tstep:Tf;
 
 simin_Angle         = [Time_raw Angle_deg];
 simin_Wgyro         = [Time_raw Wgyro_deg_sec];
-simin_step          = [Time_raw Step_sig];
+simin_step          = [Time_raw Step_sig * scaler_rad2deg];
 
+sim_deadZone        = 50.0 * scaler_deg2rad;
+sim_saturation      = 1300 * scaler_deg2rad;
 
-data_Time          = Desig_data(:,1);
-data_Wgyro         = Desig_data(:,4);
-data_disturbance   = Desig_data(:,5);
-
-target_90       = target_angle * 0.9;
+out = sim("DESIG_analysis.slx");
 
 %==========================================================================
 % Plot
@@ -136,14 +144,15 @@ target_90       = target_angle * 0.9;
 
 label_Wcmd      = '\psi_{input}';
 label_Step      = '\psi_{target}';
+label_CMD       = '\psi_{target}';
 
 
 figure(5); hold on;
-plot(Time_raw, Angle_deg, 'r', 'LineWidth', 1.2, 'DisplayName', label_Wcmd);
-plot(Time_raw, Step_sig, 'b', 'LineWidth', 1.2, 'DisplayName', label_Step);
+plot(time_uniform, Angle_deg, 'r', 'LineWidth', 1.2, 'DisplayName', label_Wcmd);
+plot(time_uniform, Step_sig, 'b', 'LineWidth', 1.2, 'DisplayName', label_Step);
+plot(time_uniform, out.sim_output, 'g', 'LineWidth', 1.2, 'DisplayName', label_CMD);
 title("time response");
 ylabel("\psi_{cmd} vs Step [deg]");
 xlabel("time [sec]");
 legend('show', 'Location', 'best');
 hold off; grid on;
-
