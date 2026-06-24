@@ -1,6 +1,6 @@
-function [freqs, gains, phases] = generate_bode_plot(data_dir)
+% function [freqs, gains, phases] = generate_bode_plot(data_dir)
 
-    
+    data_dir = '..\..\data\BodeMag\';
     sampling_freq=200.0; 
     
     addpath('../lib_function');
@@ -95,5 +95,5 @@ function [freqs, gains, phases] = generate_bode_plot(data_dir)
     % Update the phases: 
     phases=smoothed_phases;
 
-
-end
+% 
+% end

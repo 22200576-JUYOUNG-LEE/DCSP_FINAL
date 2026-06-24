@@ -49,10 +49,10 @@ figure(1); hold on;
 figure(2); hold on;
 figure(3); hold on;
 figure(4); hold on;
-for iter = 1:1:1
+for iter = 1:1:5
 
-    % W_cl        = 18 + iter * W_cl_step;         % [rad/s]
-    W_cl        = 28 ;
+    W_cl        = 18 + iter * W_cl_step;         % [rad/s]
+    % W_cl        = 28 ;
 
     % 2. tf of Gc
     Kd          = (2*W_cl*Zeta_cl*Time_const - 1)/Km; % [-]
